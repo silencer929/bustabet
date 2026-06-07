@@ -1,0 +1,229 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Player tier definitions and thresholds
+model VipTier {
+  id              String    @id @default(uuid())
+  name            String    @unique
+  minPoints       Int       @map("min_points")
+  cashbackPercent Decimal   @db.Decimal(5, 2) @map("cashback_percent")
+  bonusPercent    Decimal   @db.Decimal(5, 2) @map("bonus_percent")
+  profiles        Profile[]
+
+  @@map("vip_tiers")
+}
+
+// User credentials and session mapping
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         String   @default("PLAYER") // PLAYER, ADMIN, SUPPORT
+  createdAt    DateTime @default(now()) @map("created_at")
+  profile      Profile?
+
+  @@map("users")
+}
+
+// Profile attributes tied directly to credentials
+model Profile {
+  id                   String                @id @map("id")
+  user                 User                  @relation(fields: [id], references: [id], onDelete: Cascade)
+  email                String                @unique
+  username             String                @unique
+  fullName             String?               @map("full_name")
+  phone                String?
+  country              String?
+  currency             String?               @default("USD")
+  vipTierId            String?               @map("vip_tier_id")
+  vipTier              VipTier?              @relation(fields: [vipTierId], references: [id])
+  referralCode         String                @unique @map("referral_code")
+  referredBy           String?               @map("referred_by")
+  referrer             Profile?              @relation("ReferralTree", fields: [referredBy], references: [id])
+  referees             Profile[]             @relation("ReferralTree")
+  createdAt            DateTime              @default(now()) @map("created_at")
+  
+  // Relations
+  bets                 Bet[]
+  transactions         Transaction[]
+  notifications        Notification[]
+  referralsAsReferrer  Referral[]            @relation("ReferrerRelation")
+  referralsAsReferee   Referral[]            @relation("RefereeRelation")
+  verificationDocs     VerificationDoc[]     @relation("ProfileDocs")
+  reviewedDocs         VerificationDoc[]     @relation("ReviewedDocs")
+  supportConversations SupportConversation[]
+  supportMessages      SupportMessage[]      @relation("MessageSender")
+
+  @@map("profiles")
+}
+
+// Match details retrieved from The Odds API
+model AdminGame {
+  id           String             @id // Event ID from The Odds API
+  sport        String
+  league       String
+  homeTeam     String             @map("home_team")
+  awayTeam     String             @map("away_team")
+  startTime    DateTime           @map("start_time")
+  status       String             @default("UPCOMING") // UPCOMING, LIVE, COMPLETED
+  markets      AdminGameMarket[]
+  bets         Bet[]
+
+  @@map("admin_games")
+}
+
+// Markets and odds cached locally from The Odds API
+model AdminGameMarket {
+  id         String    @id @default(uuid())
+  gameId     String    @map("game_id")
+  game       AdminGame @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  marketName String    @map("market_name") // h2h, spreads, totals
+  selection  String    // e.g., "Home Team", "Away Team", "Over 2.5"
+  odds       Decimal   @db.Decimal(6, 2)
+  active     Boolean   @default(true)
+  bets       Bet[]
+
+  @@map("admin_game_markets")
+}
+
+// Wagers logged on behalf of a profile
+model Bet {
+  id           String          @id @default(uuid())
+  profileId    String          @map("profile_id")
+  profile      Profile         @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  gameId       String          @map("game_id")
+  game         AdminGame       @relation(fields: [gameId], references: [id])
+  marketId     String          @map("market_id")
+  market       AdminGameMarket @relation(fields: [marketId], references: [id])
+  stake        Decimal         @db.Decimal(12, 2)
+  odds         Decimal         @db.Decimal(6, 2)
+  potentialWin Decimal         @db.Decimal(12, 2) @map("potential_win")
+  status       String          @default("PENDING") // PENDING, WON, LOST, VOIDED
+  createdAt    DateTime        @default(now()) @map("created_at")
+
+  @@map("bets")
+}
+
+// Transactions mapping deposit and withdrawal lifecycles
+model Transaction {
+  id        String   @id @default(uuid())
+  profileId String   @map("profile_id")
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  type      String   // DEPOSIT, WITHDRAWAL, PAYOUT
+  amount    Decimal  @db.Decimal(12, 2)
+  currency  String
+  status    String   @default("PENDING") // PENDING, COMPLETED, FAILED
+  reference String   @unique // Provider reference (M-Pesa ID, TxHash, etc.)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("transactions")
+}
+
+// Promotional campaigns configuration
+model Promotion {
+  id          String   @id @default(uuid())
+  title       String
+  description String?  @db.Text
+  bonusAmount Decimal  @db.Decimal(12, 2) @map("bonus_amount")
+  active      Boolean  @default(true)
+  startDate   DateTime @map("start_date")
+  endDate     DateTime @map("end_date")
+
+  @@map("promotions")
+}
+
+// Referral conversions and payout states
+model Referral {
+  id         String   @id @default(uuid())
+  referrerId String   @map("referrer_id")
+  referrer   Profile  @relation("ReferrerRelation", fields: [referrerId], references: [id], onDelete: Cascade)
+  refereeId  String   @map("referee_id")
+  referee    Profile  @relation("RefereeRelation", fields: [refereeId], references: [id], onDelete: Cascade)
+  commission Decimal  @db.Decimal(12, 2)
+  status     String   @default("PENDING") // PENDING, PAID
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("referrals")
+}
+
+// Compliance and KYC identity documents
+model VerificationDoc {
+  id           String   @id @default(uuid())
+  profileId    String   @map("profile_id")
+  profile      Profile  @relation("ProfileDocs", fields: [profileId], references: [id], onDelete: Cascade)
+  documentType String   @map("document_type") // PASSPORT, NATIONAL_ID, UTILITY_BILL
+  fileUrl      String   @map("file_url")
+  status       String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  reviewedBy   String?  @map("reviewed_by")
+  reviewer     Profile? @relation("ReviewedDocs", fields: [reviewedBy], references: [id])
+  submittedAt  DateTime @default(now()) @map("submitted_at")
+
+  @@map("verification_documents")
+}
+
+// Support Conversations
+model SupportConversation {
+  id        String           @id @default(uuid())
+  profileId String           @map("profile_id")
+  profile   Profile          @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  subject   String
+  status    String           @default("OPEN") // OPEN, RESOLVED, CLOSED
+  createdAt DateTime         @default(now()) @map("created_at")
+  messages  SupportMessage[]
+
+  @@map("support_conversations")
+}
+
+// Support Messages
+model SupportMessage {
+  id             String              @id @default(uuid())
+  conversationId String              @map("conversation_id")
+  conversation   SupportConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String              @map("sender_id")
+  sender         Profile             @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  message        String              @db.Text
+  createdAt      DateTime            @default(now()) @map("created_at")
+  attachments    SupportAttachment[]
+
+  @@map("support_messages")
+}
+
+// Support Attachments
+model SupportAttachment {
+  id        String         @id @default(uuid())
+  messageId String         @map("message_id")
+  message   SupportMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  fileUrl   String         @map("file_url")
+  fileName  String         @map("file_name")
+
+  @@map("support_attachments")
+}
+
+// Real-time client and background notifications
+model Notification {
+  id        String   @id @default(uuid())
+  profileId String   @map("profile_id")
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  title     String
+  message   String   @db.Text
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("notifications")
+}
+
+// Betslip code storage for sharing bets
+model BetslipCode {
+  id         String   @id @default(uuid())
+  code       String   @unique
+  selections Json     // Array of game/market IDs
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("betslip_codes")
+}

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%sveltekit.assets%/icons/favicon.ico" sizes="any" />
+		<link rel="icon" type="image/png" href="%sveltekit.assets%/icons/favicon-32x32.png" />
+		<link rel="icon" type="image/png" href="%sveltekit.assets%/icons/favicon-16x16.png" sizes="16x16" />
+		<link rel="apple-touch-icon" href="%sveltekit.assets%/icons/apple-touch-icon.png" />
+
+
+    <!-- Global SEO Metadata -->
+    <title>Busta Bet | Premium Sportsbook & Live Sports Betting</title>
+    <meta name="description" content="Bet on football, basketball, tennis, and MMA with premium decimal odds. Enjoy instant deposits and withdrawals via Safaricom M-Pesa, PayPal, and Cryptocurrencies." />
+    <meta name="keywords" content="sports betting, live odds, football betting, mpesa betting, crypto sportsbook, epl odds, nba lines, secure betting platform" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://bustabet.com" />
+
+    <!-- OpenGraph (Facebook / LinkedIn) Social Metadata -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Busta Bet" />
+    <meta property="og:title" content="Busta Bet | Premium Sportsbook & Live Sports Betting" />
+    <meta property="og:description" content="Experience instant deposits and payouts with premium odds on major global sports fixtures." />
+    <meta property="og:url" content="https://bustabet.com" />
+    <meta property="og:image" content="%sveltekit.assets%/android-chrome-192x192.png" />
+
+    <!-- Twitter Card Social Metadata -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Busta Bet | Premium Sportsbook & Live Sports Betting" />
+    <meta name="twitter:description" content="Instant deposits and payouts on premier global leagues with competitive decimal odds." />
+    <meta name="twitter:image" content="%sveltekit.assets%/android-chrome-192x192.png" />
+
+    <!-- Prevents a visual flash of light-mode styles during server-side rendering (SSR) -->
+	 <script>
+		try {
+			const theme = localStorage.getItem('theme');
+			if (theme === 'light') {
+				document.documentElement.classList.add('light');
+			} else {
+				document.documentElement.classList.remove('light');
+			}
+		} catch (_) {
+			document.documentElement.classList.remove('light');
+		}
+	</script>
+
+    %sveltekit.head%
+  </head>
+  <body data-sveltekit-preload-data="hover" class="bg-neutral-950 text-neutral-200 antialiased selection:bg-amber-500 selection:text-neutral-950">
+    <div style="display: contents">%sveltekit.body%</div>
+  </body>
+</html>
