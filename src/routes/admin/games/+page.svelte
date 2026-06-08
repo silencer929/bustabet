@@ -4,7 +4,7 @@
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
   import { Badge } from '$lib/components/ui/badge';
-  import { Tv, Plus, ShieldAlert, CheckCircle2, ChevronRight } from 'lucide-svelte';
+  import { Tv, Plus, ShieldAlert, CheckCircle2, ChevronRight, Search, Filter } from 'lucide-svelte';
 
   let { data, form } = $props<{
     data: { games: any[] };
@@ -13,6 +13,26 @@
 
   let isSubmitting = $state(false);
   let isAddOpen = $state(false);
+
+  // Svelte 5 state variables tracking the active filter configurations
+  let searchQuery = $state('');
+  let selectedSport = $state('all');
+  let selectedStatus = $state('all');
+
+  // Svelte 5 derived state: executes real-time filtering whenever inputs are changed
+  const filteredGames = $derived(
+    data.games.filter((game) => {
+      const matchesSearch = 
+        game.homeTeam.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        game.awayTeam.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        game.league.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchesSport = selectedSport === 'all' || game.sport === selectedSport;
+      const matchesStatus = selectedStatus === 'all' || game.status === selectedStatus;
+
+      return matchesSearch && matchesSport && matchesStatus;
+    })
+  );
 
   const getStatusClass = (status: string) => {
     switch (status) {
@@ -31,7 +51,6 @@
       <h1 class="text-base font-black uppercase tracking-wider text-neutral-100">Fixtures Directory</h1>
     </div>
 
-    <!-- Toggle Add Game form collapse -->
     <Button 
       onclick={() => isAddOpen = !isAddOpen}
       class="h-10 bg-red-600 text-white font-bold rounded-lg gap-1.5 shadow-md hover:bg-red-500"
@@ -123,17 +142,60 @@
     </div>
   {/if}
 
-  <!-- Active Games List -->
-  <div class="space-y-3">
-    <h3 class="text-xs font-black tracking-widest text-neutral-500 uppercase">Active Games</h3>
+  <!-- Interactive Filters Panel (Typing Search & Select Dropdowns) -->
+  <div class="rounded-xl border border-neutral-800 bg-neutral-900/20 p-4 flex flex-col md:flex-row items-center gap-3">
+    <!-- Typing Search input -->
+    <div class="relative w-full md:flex-1">
+      <Search class="absolute left-3 top-3 h-4 w-4 text-neutral-500" />
+      <Input 
+        type="text" 
+        bind:value={searchQuery}
+        placeholder="Search by team or league..." 
+        class="h-10 w-full pl-9 bg-neutral-950 border-neutral-800 focus:border-red-500 text-xs font-semibold text-neutral-200"
+      />
+    </div>
 
-    {#if data.games.length === 0}
+    <div class="flex items-center gap-3 w-full md:w-auto shrink-0">
+      <!-- Sport Filter Dropdown -->
+      <select 
+        bind:value={selectedSport}
+        class="flex h-10 w-full md:w-44 rounded-md border border-neutral-800 bg-neutral-950 px-3 py-2 text-xs font-semibold text-neutral-400 focus:border-red-500 focus:outline-none"
+      >
+        <option value="all">All Sports</option>
+        <option value="soccer_english_premier_league">Premier League</option>
+        <option value="basketball_nba">NBA</option>
+        <option value="tennis_atp_singles">Tennis ATP</option>
+        <option value="americanfootball_nfl">NFL</option>
+      </select>
+
+      <!-- Status Filter Dropdown -->
+      <select 
+        bind:value={selectedStatus}
+        class="flex h-10 w-full md:w-36 rounded-md border border-neutral-800 bg-neutral-950 px-3 py-2 text-xs font-semibold text-neutral-400 focus:border-red-500 focus:outline-none"
+      >
+        <option value="all">All Statuses</option>
+        <option value="UPCOMING">Upcoming</option>
+        <option value="LIVE">Live</option>
+        <option value="COMPLETED">Completed</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Active Games List (Renders the reactive, filtered derived array) -->
+  <div class="space-y-3">
+    <div class="flex items-center justify-between">
+      <h3 class="text-xs font-black tracking-widest text-neutral-500 uppercase">Fixtures Matches</h3>
+      <span class="text-[10px] font-bold text-neutral-600">Showing {filteredGames.length} of {data.games.length} entries</span>
+    </div>
+
+    {#if filteredGames.length === 0}
+      <!-- Empty Filter State fallback -->
       <div class="text-center text-xs font-semibold text-neutral-600 py-16 border border-dashed border-neutral-800 rounded-lg">
-        No games registered. Click "Manually Add Game" to start.
+        No matches match the active search or filter configuration.
       </div>
     {:else}
       <div class="space-y-2">
-        {#each data.games as game}
+        {#each filteredGames as game}
           <a 
             href="/admin/games/{game.id}" 
             class="flex items-center justify-between border border-neutral-800/80 bg-neutral-900/40 p-4 rounded-xl transition duration-150 hover:border-neutral-700"
