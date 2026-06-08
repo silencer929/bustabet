@@ -8,7 +8,7 @@
   const message = $derived($page.error?.message || 'Page not found');
 </script>
 
-<div class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-neutral-950 px-6 text-center text-neutral-200">
+<div class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background px-6 text-center text-foreground">
   <div class="max-w-md w-full space-y-8">
     <!-- Visual Indicator -->
     <div class="relative flex justify-center">
@@ -56,7 +56,7 @@
         onclick={() => window.location.reload()} 
         class="w-full sm:w-auto"
       >
-        <Button variant="outline" class="w-full h-11 px-6 border-neutral-800 bg-neutral-900/40 text-neutral-200 hover:bg-neutral-900 font-bold rounded-lg gap-1.5">
+        <Button variant="outline" class="w-full h-11 px-6 border-border bg-background/40 text-foreground hover:bg-background font-bold rounded-lg gap-1.5">
           <RefreshCw class="h-4 w-4" />
           Retry Connection
         </Button>

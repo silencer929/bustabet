@@ -8,7 +8,7 @@
 {#if active}
   <div 
     transition:fade={{ duration: 450 }}
-    class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-neutral-950"
+    class="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background"
   >
     <div class="relative flex items-center justify-center">
       <div class="h-40 w-40 rounded-full border-2 border-neutral-900 border-t-2 border-t-amber-500 animate-spin"></div>

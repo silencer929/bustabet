@@ -28,11 +28,11 @@
   ];
 </script>
 
-<div class="min-h-screen bg-neutral-950 text-neutral-200 flex flex-col md:flex-row">
+<div class="min-h-screen bg-background text-foreground flex flex-col md:flex-row">
   <!-- Admin Navigation Sidebar -->
-  <aside class="w-full md:w-64 border-r border-neutral-800/80 bg-neutral-900/40 p-5 shrink-0 space-y-6">
+  <aside class="w-full md:w-64 border-r border-border/80 bg-background/40 p-5 shrink-0 space-y-6">
     <!-- Header Back CTA -->
-    <div class="flex items-center justify-between border-b border-neutral-800 pb-4 mb-2">
+    <div class="flex items-center justify-between border-b border-border pb-4 mb-2">
       <a href="/sportsbook" class="inline-flex items-center gap-1 text-xs font-bold text-neutral-500 hover:text-amber-500 transition">
         <ArrowLeft class="h-3.5 w-3.5" />
         <span>Exit Portal</span>
@@ -46,7 +46,7 @@
         <a 
           href={item.path} 
           class="flex h-11 items-center justify-between rounded-lg px-3 py-2 text-xs font-bold tracking-wide transition-all duration-150
-            {isActive(item.path) ? 'bg-red-600 text-white font-black' : 'text-neutral-400 hover:bg-neutral-900/60 hover:text-white'}"
+            {isActive(item.path) ? 'bg-red-600 text-foreground font-black' : 'text-muted-foreground hover:bg-background/60 hover:text-foreground'}"
         >
           <div class="flex items-center gap-3">
             <item.icon class="h-4 w-4 shrink-0" />

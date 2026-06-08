@@ -13,20 +13,20 @@
   const isDark = $derived(theme.current === 'dark');
 </script>
 
-<header class="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-neutral-800/80 bg-neutral-950 px-4 shadow-sm backdrop-blur-md">
+<header class="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-border/80 bg-background px-4 shadow-sm backdrop-blur-md">
   <!-- Left Side: Logo & Mobile Hamburger Menu -->
   <div class="flex items-center gap-3">
     <Button 
       variant="ghost" 
       size="icon" 
       onclick={onMenuToggle}
-      class="text-neutral-400 hover:text-white md:hidden"
+      class="text-muted-foreground hover:text-foreground md:hidden"
     >
       <Menu class="h-5 w-5" />
     </Button>
     
     <a href="/" class="flex items-center gap-2">
-      <span class="text-base font-black tracking-wider text-white">
+      <span class="text-base font-black tracking-wider text-foreground">
         Busta<span class="text-amber-500">BET</span>
       </span>
     </a>
@@ -38,7 +38,7 @@
     <Input 
       type="text" 
       placeholder="Search events, teams, leagues..." 
-      class="h-10 w-full pl-10 pr-4 bg-neutral-900/50 border-neutral-800 text-xs font-semibold focus:border-amber-500 rounded-lg text-neutral-200"
+      class="h-10 w-full pl-10 pr-4 bg-background/50 border-border text-xs font-semibold focus:border-amber-500 rounded-lg text-foreground"
     />
   </div>
 
@@ -46,9 +46,9 @@
   <div class="flex items-center gap-3">
     {#if auth.isAuthenticated}
       <!-- Localized wallet balance badge -->
-      <div class="flex h-10 items-center gap-2 rounded-lg border border-neutral-800 bg-neutral-900/40 px-3.5 py-1.5">
+      <div class="flex h-10 items-center gap-2 rounded-lg border border-border bg-background/40 px-3.5 py-1.5">
         <div class="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse"></div>
-        <span class="text-xs font-black text-neutral-200 tracking-tight">
+        <span class="text-xs font-black text-foreground tracking-tight">
           {formatCurrency(wallet.balance, wallet.currency)}
         </span>
       </div>
@@ -58,7 +58,7 @@
         variant="ghost" 
         size="icon" 
         onclick={() => theme.toggle()}
-        class="text-neutral-400 hover:text-white"
+        class="text-muted-foreground hover:text-foreground"
       >
         {#if isDark}
           <Sun class="h-4 w-4" />
@@ -78,7 +78,7 @@
       <Button 
         variant="ghost" 
         size="icon" 
-        class="text-neutral-400 hover:text-white relative"
+        class="text-muted-foreground hover:text-foreground relative"
       >
         <span class="absolute top-2 right-2 h-1.5 w-1.5 bg-red-500 rounded-full"></span>
         <Bell class="h-4 w-4" />
@@ -88,10 +88,10 @@
       <Button 
         variant="ghost" 
         onclick={onMenuToggle}
-        class="h-10 flex items-center gap-2 border border-neutral-800 bg-neutral-900/20 px-3 text-neutral-400 hover:text-white rounded-lg"
+        class="h-10 flex items-center gap-2 border border-border bg-background/20 px-3 text-muted-foreground hover:text-foreground rounded-lg"
       >
         <UserRound class="h-4 w-4 text-amber-500" />
-        <span class="hidden sm:inline text-xs font-bold text-neutral-200">{auth.user?.username}</span>
+        <span class="hidden sm:inline text-xs font-bold text-foreground">{auth.user?.username}</span>
       </Button>
     {:else}
       <!-- Guest Controls -->
@@ -99,7 +99,7 @@
         variant="ghost" 
         size="icon" 
         onclick={() => theme.toggle()}
-        class="text-neutral-400 hover:text-white"
+        class="text-muted-foreground hover:text-foreground"
       >
         {#if isDark}
           <Sun class="h-4 w-4" />
@@ -108,7 +108,7 @@
         {/if}
       </Button>
       <a href="/auth/login">
-        <Button variant="ghost" class="h-10 text-xs font-bold text-neutral-400 hover:text-white">
+        <Button variant="ghost" class="h-10 text-xs font-bold text-muted-foreground hover:text-foreground">
           Log In
         </Button>
       </a>

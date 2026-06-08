@@ -13,13 +13,13 @@
 
 <div class="space-y-6">
   <!-- Back Navigation Button -->
-  <a href="/wallet" class="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-400 hover:text-white transition">
+  <a href="/wallet" class="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition">
     <ArrowDownLeft class="h-4 w-4" />
     <span>Back to Wallet</span>
   </a>
 
   <div class="flex items-center justify-center min-h-[calc(100vh-16rem)]">
-    <div class="w-full max-w-md rounded-2xl border border-neutral-800 bg-neutral-900/60 p-6 shadow-xl backdrop-blur-md space-y-6">
+    <div class="w-full max-w-md rounded-2xl border border-border bg-background/60 p-6 shadow-xl backdrop-blur-md space-y-6">
       <!-- Title Header -->
       <div class="text-center space-y-1.5">
         <h2 class="text-2xl font-black tracking-tight text-neutral-100 flex items-center justify-center gap-2">
@@ -67,7 +67,7 @@
 
           <!-- Amount Input -->
           <div class="space-y-1.5">
-            <label for="amount" class="text-xs font-bold text-neutral-400">Amount to Deposit</label>
+            <label for="amount" class="text-xs font-bold text-muted-foreground">Amount to Deposit</label>
             <div class="relative">
               <Input 
                 id="amount" 
@@ -76,7 +76,7 @@
                 required 
                 placeholder="500" 
                 disabled={isSubmitting}
-                class="bg-neutral-950 border-neutral-800 focus:border-amber-500 text-xs h-10 pr-12 font-bold text-neutral-200" 
+                class="bg-background border-border focus:border-amber-500 text-xs h-10 pr-12 font-bold text-foreground" 
               />
               <span class="absolute right-3 top-2.5 text-xs font-bold text-neutral-500">{auth.user?.currency || 'KES'}</span>
             </div>
@@ -84,7 +84,7 @@
 
           <!-- M-Pesa Phone Number Input -->
           <div class="space-y-1.5">
-            <label for="phone" class="text-xs font-bold text-neutral-400">M-Pesa Mobile Number</label>
+            <label for="phone" class="text-xs font-bold text-muted-foreground">M-Pesa Mobile Number</label>
             <Input 
               id="phone" 
               name="phone" 
@@ -93,7 +93,7 @@
               value={auth.user?.phone || ''}
               placeholder="+254712345678" 
               disabled={isSubmitting}
-              class="bg-neutral-950 border-neutral-800 focus:border-amber-500 text-xs h-10 font-bold text-neutral-200" 
+              class="bg-background border-border focus:border-amber-500 text-xs h-10 font-bold text-foreground" 
             />
             <span class="text-[10px] text-neutral-500 block">Please enter in international E.164 format (+254...)</span>
           </div>
@@ -102,7 +102,7 @@
           <Button 
             type="submit" 
             disabled={isSubmitting}
-            class="w-full h-11 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-black rounded-lg shadow-md transition disabled:bg-neutral-800 disabled:text-neutral-500"
+            class="w-full h-11 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-black rounded-lg shadow-md transition disabled:bg-background disabled:text-neutral-500"
           >
             {#if isSubmitting}
               <div class="flex items-center justify-center gap-2">

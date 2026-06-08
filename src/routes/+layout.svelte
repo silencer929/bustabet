@@ -21,6 +21,7 @@
   let isMenuOpen = $state(false);
   let isBetslipOpen = $state(false);
   let isLoading = $state(true);
+  let theme = $state('dark');
 
   // Derived state to check if the user is currently browsing any admin route
   const isAdminRoute = $derived($page.url.pathname.startsWith('/admin'));
@@ -41,11 +42,11 @@
   });
 </script>
 
-<Toaster theme="dark" position="top-right" richColors />
+<Toaster theme={theme} position="top-right" richColors />
 
 <Preloader active={isLoading} />
 
-<div class="min-h-screen bg-neutral-950 text-neutral-200 flex flex-col font-sans">
+<div class="min-h-screen bg-background text-foreground flex flex-col font-sans">
   <!-- Top Navigation Header (Render globally across both admin and player routes) -->
   <Header onMenuToggle={() => isMenuOpen = !isMenuOpen} />
 
@@ -77,8 +78,8 @@
 
     <!-- Conditionally render Right-Hand BetSlip Drawer (Exclude on Admin routes) -->
     {#if !isAdminRoute}
-      <div class="fixed top-28 bottom-0 right-0 z-30 w-80 border-l border-neutral-800 bg-neutral-950 transition-transform duration-300
-        {isBetslipOpen ? 'translate-x-0' : 'translate-x-full'} md:translate-x-0"
+      <div class="fixed top-28 bottom-0 right-0 z-30 w-80 border-l border-border bg-background transition-transform duration-300
+        {isBetslipOpen ? 'translate-x-0' : 'translate-x-full'} lg:translate-x-0"
       >
         <BetSlip />
       </div>

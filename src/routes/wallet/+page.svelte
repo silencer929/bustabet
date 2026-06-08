@@ -23,13 +23,13 @@
 
 <div class="space-y-6">
   <!-- Section Title -->
-  <div class="flex items-center gap-2 border-b border-neutral-800/80 pb-3">
+  <div class="flex items-center gap-2 border-b border-border/80 pb-3">
     <Wallet class="h-5 w-5 text-amber-500" />
     <h1 class="text-base font-black uppercase tracking-wider text-neutral-100">Wallet Dashboard</h1>
   </div>
 
   <!-- Balance Visual Hero Card -->
-  <div class="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+  <div class="rounded-2xl border border-border bg-background/40 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
     <div class="space-y-1.5">
       <span class="text-xs font-bold text-neutral-500 uppercase tracking-widest">Available Balance</span>
       <div class="text-3xl font-black text-neutral-100 tracking-tight">
@@ -46,7 +46,7 @@
         </Button>
       </a>
       <a href="/wallet/withdraw" class="flex-1 sm:flex-none">
-        <Button variant="outline" class="w-full h-10 border-neutral-800 bg-neutral-950 text-neutral-200 hover:bg-neutral-900 font-bold rounded-lg gap-1.5">
+        <Button variant="outline" class="w-full h-10 border-border bg-background text-foreground hover:bg-background font-bold rounded-lg gap-1.5">
           <ArrowUpRight class="h-4 w-4" />
           Withdraw
         </Button>
@@ -65,15 +65,15 @@
     </div>
 
     {#if data.transactions.length === 0}
-      <div class="text-center text-xs font-semibold text-neutral-600 py-12 border border-dashed border-neutral-800 rounded-lg">
+      <div class="text-center text-xs font-semibold text-neutral-600 py-12 border border-dashed border-border rounded-lg">
         No transactions logged yet
       </div>
     {:else}
       <div class="space-y-2">
         {#each data.transactions as tx}
-          <div class="flex items-center justify-between border border-neutral-800 bg-neutral-900/20 p-3.5 rounded-xl">
+          <div class="flex items-center justify-between border border-border bg-background/20 p-3.5 rounded-xl">
             <div class="flex items-center gap-3">
-              <div class="rounded-lg bg-neutral-900 p-2 border border-neutral-800 text-neutral-400">
+              <div class="rounded-lg bg-background p-2 border border-border text-muted-foreground">
                 {#if tx.type === 'DEPOSIT' || tx.type === 'PAYOUT'}
                   <ArrowDownLeft class="h-4 w-4 text-emerald-500" />
                 {:else}
@@ -81,7 +81,7 @@
                 {/if}
               </div>
               <div>
-                <div class="text-xs font-bold text-neutral-200">{tx.type}</div>
+                <div class="text-xs font-bold text-foreground">{tx.type}</div>
                 <div class="text-[10px] text-neutral-500 mt-0.5">{tx.reference} &bull; {formatGameTime(tx.createdAt)}</div>
               </div>
             </div>

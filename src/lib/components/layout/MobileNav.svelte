@@ -14,7 +14,7 @@
   }
 </script>
 
-<div class="fixed bottom-0 left-0 right-0 z-40 flex h-16 border-t border-neutral-800/80 bg-neutral-950/95 shadow-lg backdrop-blur-md md:hidden">
+<div class="fixed bottom-0 left-0 right-0 z-40 flex h-16 border-t border-border/80 bg-background/95 shadow-lg backdrop-blur-md md:hidden">
   <!-- Sportsbook Tab -->
   <a 
     href="/sportsbook" 

@@ -40,24 +40,24 @@
   );
 </script>
 
-<div class="rounded-lg md:rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/60 p-3 md:p-5 shadow-sm transition-all hover:border-neutral-300 dark:hover:border-neutral-700/80 flex flex-col justify-between h-52 md:h-56 min-w-[260px] md:min-w-[280px]">
+<div class="rounded-lg md:rounded-xl border border-neutral-200 dark:border-border bg-white dark:bg-background/60 p-3 md:p-5 shadow-sm transition-all hover:border-neutral-300 dark:hover:border-neutral-700/80 flex flex-col justify-between h-52 md:h-56 min-w-[260px] md:min-w-[280px]">
   <!-- Top: League Name (Left) & Countdown Timer (Right) -->
   <div class="flex items-start justify-between w-full gap-2">
-    <span class="text-[9px] md:text-[10px] font-black tracking-wider text-neutral-400 dark:text-neutral-500 uppercase truncate">
+    <span class="text-[9px] md:text-[10px] font-black tracking-wider text-muted-foreground dark:text-neutral-500 uppercase truncate">
       {game.league}
     </span>
     
     <div class="flex flex-col items-end text-right space-y-0.5 shrink-0">
       {#if isLive}
-        <Badge class="bg-red-600 hover:bg-red-600 animate-pulse text-[7px] md:text-[8px] font-black px-1 md:px-1.5 py-0.5 tracking-wider rounded text-white">
+        <Badge class="bg-red-600 hover:bg-red-600 animate-pulse text-[7px] md:text-[8px] font-black px-1 md:px-1.5 py-0.5 tracking-wider rounded text-foreground">
           LIVE
         </Badge>
       {:else}
-        <div class="flex items-center gap-1 text-[10px] md:text-[11px] font-bold text-neutral-800 dark:text-neutral-400">
-          <Clock class="h-3 w-3 text-neutral-400 shrink-0" />
+        <div class="flex items-center gap-1 text-[10px] md:text-[11px] font-bold text-neutral-800 dark:text-muted-foreground">
+          <Clock class="h-3 w-3 text-muted-foreground shrink-0" />
           <span>{remainingTime}</span>
         </div>
-        <span class="text-[8px] md:text-[9px] font-bold text-neutral-400 dark:text-neutral-500">{formattedDate}</span>
+        <span class="text-[8px] md:text-[9px] font-bold text-muted-foreground dark:text-neutral-500">{formattedDate}</span>
       {/if}
     </div>
   </div>
@@ -69,7 +69,7 @@
   </div>
 
   <!-- Bottom: Odds Selection Panel (Left) & Advanced Markets Link (Right) -->
-  <div class="flex items-end justify-between w-full border-t border-neutral-100 dark:border-neutral-800/60 pt-2 md:pt-3 gap-2">
+  <div class="flex items-end justify-between w-full border-t border-neutral-100 dark:border-border/60 pt-2 md:pt-3 gap-2">
     <!-- Horizontal Odds Buttons row -->
     <div class="flex items-center gap-1">
       {#if filteredMarkets.length > 0}
@@ -85,14 +85,14 @@
           />
         {/each}
       {:else}
-        <span class="text-xs font-semibold text-neutral-400 dark:text-neutral-600">Markets suspended</span>
+        <span class="text-xs font-semibold text-muted-foreground dark:text-neutral-600">Markets suspended</span>
       {/if}
     </div>
 
     <!-- Advanced markets redirect link -->
     <a 
       href="/sportsbook/match/{game.id}" 
-      class="text-[9px] md:text-[11px] font-bold text-neutral-500 dark:text-neutral-400 hover:text-amber-500 dark:hover:text-amber-500 transition shrink-0 whitespace-nowrap"
+      class="text-[9px] md:text-[11px] font-bold text-neutral-500 dark:text-muted-foreground hover:text-amber-500 dark:hover:text-amber-500 transition shrink-0 whitespace-nowrap"
     >
       +{extraMarketsCount > 0 ? extraMarketsCount + 12 : 28}
     </a>

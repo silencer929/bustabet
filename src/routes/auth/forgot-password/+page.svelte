@@ -11,7 +11,7 @@
 </script>
 
 <div class="flex min-h-[calc(100vh-12rem)] items-center justify-center px-4 py-8">
-  <div class="w-full max-w-md rounded-2xl border border-neutral-800 bg-neutral-900/60 p-6 shadow-xl backdrop-blur-md space-y-6">
+  <div class="w-full max-w-md rounded-2xl border border-border bg-background/60 p-6 shadow-xl backdrop-blur-md space-y-6">
     <!-- Header Title -->
     <div class="text-center space-y-1.5">
       <h2 class="text-2xl font-black tracking-tight text-neutral-100 flex items-center justify-center gap-2">
@@ -30,7 +30,7 @@
         <p class="text-xs text-green-400 font-bold leading-relaxed">{form.message}</p>
         <div class="pt-2">
           <a href="/auth/login">
-            <Button variant="outline" class="h-9 w-full text-xs font-bold border-neutral-800 bg-neutral-950 text-neutral-200">
+            <Button variant="outline" class="h-9 w-full text-xs font-bold border-border bg-background text-foreground">
               Return to Login
             </Button>
           </a>
@@ -57,7 +57,7 @@
         {/if}
 
         <div class="space-y-1.5">
-          <label for="email" class="text-xs font-bold text-neutral-400">Email Address</label>
+          <label for="email" class="text-xs font-bold text-muted-foreground">Email Address</label>
           <Input 
             id="email" 
             name="email" 
@@ -65,7 +65,7 @@
             required 
             placeholder="name@example.com" 
             disabled={isSubmitting}
-            class="bg-neutral-950 border-neutral-800 focus:border-amber-500 text-xs h-10 font-medium text-neutral-200" 
+            class="bg-background border-border focus:border-amber-500 text-xs h-10 font-medium text-foreground" 
           />
         </div>
 
@@ -73,7 +73,7 @@
         <Button 
           type="submit" 
           disabled={isSubmitting}
-          class="w-full h-11 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-black rounded-lg shadow-md transition disabled:bg-neutral-800 disabled:text-neutral-500"
+          class="w-full h-11 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-black rounded-lg shadow-md transition disabled:bg-background disabled:text-neutral-500"
         >
           {isSubmitting ? 'Sending Request...' : 'Send Recovery Link'}
         </Button>
@@ -82,7 +82,7 @@
 
     <!-- Footer Links -->
     {#if !form?.success}
-      <div class="text-center border-t border-neutral-800/80 pt-4 text-xs font-semibold text-neutral-500">
+      <div class="text-center border-t border-border/80 pt-4 text-xs font-semibold text-neutral-500">
         Remember your credentials? 
         <a href="/auth/login" class="text-amber-500 hover:text-amber-400 transition ml-1">Log In</a>
       </div>

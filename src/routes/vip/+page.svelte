@@ -25,16 +25,16 @@
 
 <div class="space-y-6">
   <!-- Page Header -->
-  <div class="flex items-center gap-2 border-b border-neutral-800/80 pb-3">
+  <div class="flex items-center gap-2 border-b border-border/80 pb-3">
     <Crown class="h-5 w-5 text-amber-500" />
     <h1 class="text-base font-black uppercase tracking-wider text-neutral-100">VIP Club</h1>
   </div>
 
   <!-- VIP Progress Dashboard Card -->
-  <div class="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6 space-y-6">
+  <div class="rounded-2xl border border-border bg-background/40 p-6 space-y-6">
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div class="flex items-center gap-4">
-        <div class="rounded-xl bg-neutral-950 p-4 border border-neutral-800 text-amber-500 shadow-sm relative">
+        <div class="rounded-xl bg-background p-4 border border-border text-amber-500 shadow-sm relative">
           <Crown class="h-8 w-8 animate-pulse" />
           <span class="absolute -top-1 -right-1 flex h-3 w-3">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
@@ -56,16 +56,16 @@
 
     <!-- Svelte 5 Dynamic Progress Bar -->
     {#if data.nextTier}
-      <div class="space-y-2 border-t border-neutral-800/60 pt-6">
+      <div class="space-y-2 border-t border-border/60 pt-6">
         <div class="flex justify-between items-center text-xs font-bold">
-          <span class="text-neutral-400 flex items-center gap-1.5">
+          <span class="text-muted-foreground flex items-center gap-1.5">
             <TrendingUp class="h-4 w-4 text-neutral-500" />
             <span>Progress to {data.nextTier.name}</span>
           </span>
           <span class="text-amber-500">{progressMetrics.remaining} points remaining</span>
         </div>
 
-        <div class="h-3 w-full bg-neutral-950 rounded-full border border-neutral-800 overflow-hidden p-0.5">
+        <div class="h-3 w-full bg-background rounded-full border border-border overflow-hidden p-0.5">
           <div 
             style="width: {progressMetrics.percentage}%" 
             class="h-full bg-amber-500 rounded-full transition-all duration-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"
@@ -90,21 +90,21 @@
         <div class="rounded-xl border p-5 flex flex-col justify-between space-y-4 transition duration-150
           {isCurrent 
             ? 'border-amber-500 bg-amber-500/5 shadow-[0_0_12px_rgba(245,158,11,0.05)]' 
-            : 'border-neutral-800 bg-neutral-900/20'}"
+            : 'border-border bg-background/20'}"
         >
           <div class="space-y-1">
             <h4 class="text-sm font-black text-neutral-100">{tier.name}</h4>
             <span class="text-[9px] font-bold text-neutral-500 tracking-wider">Required points: {tier.minPoints}</span>
           </div>
 
-          <div class="border-t border-neutral-800/60 pt-3 space-y-2 text-xs font-semibold text-neutral-400">
+          <div class="border-t border-border/60 pt-3 space-y-2 text-xs font-semibold text-muted-foreground">
             <div class="flex justify-between">
               <span>Monthly Cashback</span>
-              <span class="text-neutral-200">{tier.cashbackPercent}%</span>
+              <span class="text-foreground">{tier.cashbackPercent}%</span>
             </div>
             <div class="flex justify-between">
               <span>Deposit Bonus</span>
-              <span class="text-neutral-200">+{tier.bonusPercent}%</span>
+              <span class="text-foreground">+{tier.bonusPercent}%</span>
             </div>
           </div>
 
@@ -113,7 +113,7 @@
               Current Rank
             </div>
           {:else}
-            <div class="rounded bg-neutral-950 border border-neutral-800 text-neutral-500 text-center font-bold py-1.5 text-[10px] tracking-widest uppercase">
+            <div class="rounded bg-background border border-border text-neutral-500 text-center font-bold py-1.5 text-[10px] tracking-widest uppercase">
               Locked
             </div>
           {/if}

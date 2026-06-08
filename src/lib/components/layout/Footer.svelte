@@ -4,12 +4,12 @@
   const currentYear = new Date().getFullYear();
 </script>
 
-<footer class="border-t border-neutral-800/80 bg-neutral-950 px-6 py-12 text-neutral-400 pb-24 md:pb-12">
+<footer class="border-t border-border/80 bg-background px-6 py-12 text-muted-foreground pb-24 md:pb-12">
   <div class="mx-auto max-w-7xl space-y-8">
     <!-- Brand and Description -->
     <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
       <div class="space-y-4">
-        <span class="text-base font-black tracking-wider text-white">
+        <span class="text-base font-black tracking-wider text-foreground">
           Busta<span class="text-amber-500">BET</span>
         </span>
         <p class="text-xs leading-relaxed text-neutral-500">
@@ -38,19 +38,19 @@
           </div>
           <div class="flex items-start gap-2.5">
             <ShieldAlert class="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
-            <span class="text-neutral-400">Strictly 18+. Responsible gaming is highly encouraged. Gambling can be addictive.</span>
+            <span class="text-muted-foreground">Strictly 18+. Responsible gaming is highly encouraged. Gambling can be addictive.</span>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Supported payment gateways -->
-    <div class="border-t border-neutral-800/60 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="border-t border-border/60 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
       <div class="flex flex-wrap items-center gap-4 text-xs font-bold text-neutral-600">
         <span class="uppercase tracking-widest">Supported Gateways:</span>
-        <span class="hover:text-neutral-400 transition">M-PESA</span>
-        <span class="hover:text-neutral-400 transition">PAYPAL</span>
-        <span class="hover:text-neutral-400 transition">USDT / BTC</span>
+        <span class="hover:text-muted-foreground transition">M-PESA</span>
+        <span class="hover:text-muted-foreground transition">PAYPAL</span>
+        <span class="hover:text-muted-foreground transition">USDT / BTC</span>
       </div>
 
       <div class="text-[10px] font-bold text-neutral-600 tracking-wider">

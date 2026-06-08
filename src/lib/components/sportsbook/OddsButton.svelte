@@ -56,7 +56,7 @@
 <Button
   variant="outline"
   onclick={handleOddsClick}
-  class="flex flex-col h-14 w-16 items-center justify-center p-1.5 transition-all duration-150 rounded-lg border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/40 text-neutral-800 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800
+  class="flex flex-col h-14 w-16 items-center justify-center p-1.5 transition-all duration-150 rounded-lg border-neutral-200 dark:border-border bg-neutral-50/50 dark:bg-background/40 text-neutral-800 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-background
     {isSelected ? 'bg-amber-500 border-amber-500 dark:bg-amber-500 dark:border-amber-500 text-neutral-950 dark:text-neutral-950 hover:bg-amber-400 dark:hover:bg-amber-400 font-bold shadow-[0_0_12px_rgba(245,158,11,0.25)]' : ''}"
 >
   <span class="text-[9px] font-bold opacity-60 uppercase">{shortLabel}</span>

@@ -11,7 +11,7 @@
 
   // Filter to compute the queue of pending withdrawals awaiting review
   const pendingWithdrawals = $derived(
-    data.transactions.filter((tx) => tx.type === 'WITHDRAWAL' && tx.status === 'PENDING')
+    data.transactions.filter((tx:any) => tx.type === 'WITHDRAWAL' && tx.status === 'PENDING')
   );
 
   let isSubmitting = $state(false);
@@ -27,7 +27,7 @@
 
 <div class="space-y-6">
   <!-- Page Header -->
-  <div class="flex items-center gap-2 border-b border-neutral-800/80 pb-3">
+  <div class="flex items-center gap-2 border-b border-border/80 pb-3">
     <ArrowRightLeft class="h-5 w-5 text-red-500" />
     <h1 class="text-base font-black uppercase tracking-wider text-neutral-100">Transaction Overseer</h1>
   </div>
@@ -37,20 +37,20 @@
     <h2 class="text-xs font-black tracking-widest text-red-400 uppercase flex items-center gap-1.5">
       <span>Pending Withdrawal Queue</span>
       {#if pendingWithdrawals.length > 0}
-        <span class="rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-black text-white">{pendingWithdrawals.length}</span>
+        <span class="rounded-full bg-red-600 px-2 py-0.5 text-[10px] font-black text-foreground">{pendingWithdrawals.length}</span>
       {/if}
     </h2>
 
     {#if pendingWithdrawals.length === 0}
-      <div class="text-center text-xs font-semibold text-neutral-600 py-12 border border-dashed border-neutral-800 rounded-lg bg-neutral-900/10">
+      <div class="text-center text-xs font-semibold text-neutral-600 py-12 border border-dashed border-border rounded-lg bg-background/10">
         All payouts clear! No pending withdrawals awaiting approval.
       </div>
     {:else}
       <div class="space-y-2">
         {#each pendingWithdrawals as tx}
-          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border border-neutral-800 bg-neutral-900/40 p-4 rounded-xl gap-4">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between border border-border bg-background/40 p-4 rounded-xl gap-4">
             <div>
-              <div class="text-xs font-bold text-neutral-200">Withdrawal Request: {tx.profile.username}</div>
+              <div class="text-xs font-bold text-foreground">Withdrawal Request: {tx.profile.username}</div>
               <div class="text-[10px] text-neutral-500 mt-1">Ref: {tx.reference} &bull; Requested {formatGameTime(tx.createdAt)}</div>
               <div class="text-xs font-black text-red-500 mt-1">{formatCurrency(tx.amount, tx.currency)}</div>
             </div>
@@ -74,7 +74,7 @@
                 <Button 
                   type="submit" 
                   disabled={isSubmitting}
-                  class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-9 px-4 rounded-lg text-xs gap-1.5"
+                  class="w-full bg-emerald-600 hover:bg-emerald-500 text-foreground font-bold h-9 px-4 rounded-lg text-xs gap-1.5"
                 >
                   <Check class="h-4 w-4" />
                   Approve
@@ -99,7 +99,7 @@
                   type="submit" 
                   disabled={isSubmitting}
                   variant="outline"
-                  class="w-full border-neutral-800 bg-neutral-950 text-neutral-200 hover:bg-neutral-900 hover:text-red-400 font-bold h-9 px-4 rounded-lg text-xs gap-1.5"
+                  class="w-full border-border bg-background text-foreground hover:bg-background hover:text-red-400 font-bold h-9 px-4 rounded-lg text-xs gap-1.5"
                 >
                   <X class="h-4 w-4" />
                   Reject
@@ -116,9 +116,9 @@
   <div class="space-y-3">
     <h3 class="text-xs font-black tracking-widest text-neutral-500 uppercase">Global Audit Ledger</h3>
 
-    <div class="overflow-x-auto rounded-xl border border-neutral-800 bg-neutral-900/20">
-      <table class="w-full border-collapse text-left text-xs text-neutral-400">
-        <thead class="border-b border-neutral-800 bg-neutral-900/60 font-bold uppercase tracking-wider text-neutral-500 text-[10px]">
+    <div class="overflow-x-auto rounded-xl border border-border bg-background/20">
+      <table class="w-full border-collapse text-left text-xs text-muted-foreground">
+        <thead class="border-b border-border bg-background/60 font-bold uppercase tracking-wider text-neutral-500 text-[10px]">
           <tr>
             <th class="px-4 py-3">Player</th>
             <th class="px-4 py-3">Type</th>
@@ -130,8 +130,8 @@
         </thead>
         <tbody class="divide-y divide-neutral-800 font-medium">
           {#each data.transactions as tx}
-            <tr class="hover:bg-neutral-900/10 transition duration-150">
-              <td class="whitespace-nowrap px-4 py-4 text-neutral-200 font-bold">{tx.profile.username}</td>
+            <tr class="hover:bg-background/10 transition duration-150">
+              <td class="whitespace-nowrap px-4 py-4 text-foreground font-bold">{tx.profile.username}</td>
               <td class="whitespace-nowrap px-4 py-4">
                 <div class="flex items-center gap-2">
                   {#if tx.type === 'DEPOSIT' || tx.type === 'PAYOUT'}
@@ -143,7 +143,7 @@
                 </div>
               </td>
               <td class="whitespace-nowrap px-4 py-4 font-mono font-bold tracking-tight text-neutral-300">{tx.reference}</td>
-              <td class="whitespace-nowrap px-4 py-4 text-neutral-400">{formatGameTime(tx.createdAt)}</td>
+              <td class="whitespace-nowrap px-4 py-4 text-muted-foreground">{formatGameTime(tx.createdAt)}</td>
               <td class="whitespace-nowrap px-4 py-4">
                 <Badge class="border text-[9px] font-bold px-2 py-0.5 rounded {getStatusClass(tx.status)}">
                   {tx.status}

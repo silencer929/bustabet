@@ -28,7 +28,7 @@
 
 <div class="space-y-6">
   <!-- Page Header -->
-  <div class="flex items-center gap-2 border-b border-neutral-800/80 pb-3">
+  <div class="flex items-center gap-2 border-b border-border/80 pb-3">
     <Share2 class="h-5 w-5 text-amber-500" />
     <h1 class="text-base font-black uppercase tracking-wider text-neutral-100">Affiliate Center</h1>
   </div>
@@ -36,8 +36,8 @@
   <!-- Stats Grid -->
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <!-- Active sign-ups -->
-    <div class="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6 flex items-center gap-4">
-      <div class="rounded-full bg-neutral-950 p-3 border border-neutral-800 text-amber-500">
+    <div class="rounded-2xl border border-border bg-background/40 p-6 flex items-center gap-4">
+      <div class="rounded-full bg-background p-3 border border-border text-amber-500">
         <Users class="h-5 w-5" />
       </div>
       <div class="space-y-1">
@@ -47,8 +47,8 @@
     </div>
 
     <!-- Active sign-ups -->
-    <div class="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6 flex items-center gap-4">
-      <div class="rounded-full bg-neutral-950 p-3 border border-neutral-800 text-amber-500">
+    <div class="rounded-2xl border border-border bg-background/40 p-6 flex items-center gap-4">
+      <div class="rounded-full bg-background p-3 border border-border text-amber-500">
         <Trophy class="h-5 w-5" />
       </div>
       <div class="space-y-1">
@@ -61,14 +61,14 @@
   </div>
 
   <!-- Referral Link Box -->
-  <div class="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6 space-y-4">
+  <div class="rounded-2xl border border-border bg-background/40 p-6 space-y-4">
     <div class="space-y-1.5">
       <h2 class="text-xs font-black tracking-widest text-neutral-300 uppercase">My Invite Link</h2>
       <p class="text-xs text-neutral-500 font-semibold leading-relaxed">Share this custom link with friends. You will receive commissions on their turnovers and initial deposits!</p>
     </div>
 
     <div class="flex flex-col sm:flex-row gap-2">
-      <div class="flex-1 rounded-lg border border-neutral-800 bg-neutral-950 px-4 py-3 text-xs font-mono font-bold text-neutral-300 truncate">
+      <div class="flex-1 rounded-lg border border-border bg-background px-4 py-3 text-xs font-mono font-bold text-neutral-300 truncate">
         {referralLink}
       </div>
       <Button 
@@ -91,15 +91,15 @@
     <h3 class="text-xs font-black tracking-widest text-neutral-500 uppercase">Referee Commission Ledgers</h3>
 
     {#if data.referrals.length === 0}
-      <div class="text-center text-xs font-semibold text-neutral-600 py-16 border border-dashed border-neutral-800 rounded-lg">
+      <div class="text-center text-xs font-semibold text-neutral-600 py-16 border border-dashed border-border rounded-lg">
         No active referrals logged yet
       </div>
     {:else}
       <div class="space-y-2">
         {#each data.referrals as ref}
-          <div class="flex items-center justify-between border border-neutral-800 bg-neutral-900/40 p-4 rounded-xl">
+          <div class="flex items-center justify-between border border-border bg-background/40 p-4 rounded-xl">
             <div>
-              <div class="text-xs font-bold text-neutral-200">User: {ref.referee.username}</div>
+              <div class="text-xs font-bold text-foreground">User: {ref.referee.username}</div>
               <div class="text-[10px] text-neutral-500 mt-1">Converted: {formatGameTime(ref.createdAt)}</div>
             </div>
 

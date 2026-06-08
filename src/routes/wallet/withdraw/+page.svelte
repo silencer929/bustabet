@@ -21,13 +21,13 @@
 
 <div class="space-y-6">
   <!-- Back Navigation Button -->
-  <a href="/wallet" class="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-400 hover:text-white transition">
+  <a href="/wallet" class="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition">
     <ArrowUpRight class="h-4 w-4" />
     <span>Back to Wallet</span>
   </a>
 
   <div class="flex items-center justify-center min-h-[calc(100vh-16rem)]">
-    <div class="w-full max-w-md rounded-2xl border border-neutral-800 bg-neutral-900/60 p-6 shadow-xl backdrop-blur-md space-y-6">
+    <div class="w-full max-w-md rounded-2xl border border-border bg-background/60 p-6 shadow-xl backdrop-blur-md space-y-6">
       <!-- Title Header -->
       <div class="text-center space-y-1.5">
         <h2 class="text-2xl font-black tracking-tight text-neutral-100 flex items-center justify-center gap-2">
@@ -73,14 +73,14 @@
           {/if}
 
           <!-- Balance Metric Display -->
-          <div class="rounded-lg bg-neutral-950 border border-neutral-800/80 px-4 py-2.5 flex justify-between items-center text-xs font-bold">
+          <div class="rounded-lg bg-background border border-border/80 px-4 py-2.5 flex justify-between items-center text-xs font-bold">
             <span class="text-neutral-500">Available Balance</span>
-            <span class="text-neutral-200">{formatCurrency(data.balance, auth.user?.currency || 'USD')}</span>
+            <span class="text-foreground">{formatCurrency(data.balance, auth.user?.currency || 'USD')}</span>
           </div>
 
           <!-- Amount Input -->
           <div class="space-y-1.5">
-            <label for="amount" class="text-xs font-bold text-neutral-400">Withdrawal Amount</label>
+            <label for="amount" class="text-xs font-bold text-muted-foreground">Withdrawal Amount</label>
             <div class="relative">
               <Input 
                 id="amount" 
@@ -90,7 +90,7 @@
                 bind:value={inputAmount}
                 placeholder="500" 
                 disabled={isSubmitting}
-                class="bg-neutral-950 border-neutral-800 focus:border-amber-500 text-xs h-10 pr-12 font-bold text-neutral-200" 
+                class="bg-background border-border focus:border-amber-500 text-xs h-10 pr-12 font-bold text-foreground" 
               />
               <span class="absolute right-3 top-2.5 text-xs font-bold text-neutral-500">{auth.user?.currency || 'KES'}</span>
             </div>
@@ -101,7 +101,7 @@
 
           <!-- Destination Identifier (Phone or Account number) -->
           <div class="space-y-1.5">
-            <label for="destination" class="text-xs font-bold text-neutral-400">Destination Number / Account</label>
+            <label for="destination" class="text-xs font-bold text-muted-foreground">Destination Number / Account</label>
             <Input 
               id="destination" 
               name="destination" 
@@ -110,7 +110,7 @@
               value={auth.user?.phone || ''}
               placeholder="+254712345678" 
               disabled={isSubmitting}
-              class="bg-neutral-950 border-neutral-800 focus:border-amber-500 text-xs h-10 font-bold text-neutral-200" 
+              class="bg-background border-border focus:border-amber-500 text-xs h-10 font-bold text-foreground" 
             />
             <span class="text-[10px] text-neutral-500 block">Payouts are sent to this registered telephone or account number</span>
           </div>
@@ -119,7 +119,7 @@
           <Button 
             type="submit" 
             disabled={isSubmitting || exceedsBalance || inputAmount === null || inputAmount <= 0}
-            class="w-full h-11 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-black rounded-lg shadow-md transition disabled:bg-neutral-800 disabled:text-neutral-500"
+            class="w-full h-11 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-black rounded-lg shadow-md transition disabled:bg-background disabled:text-neutral-500"
           >
             {#if isSubmitting}
               <div class="flex items-center justify-center gap-2">

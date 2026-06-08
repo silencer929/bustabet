@@ -26,7 +26,7 @@
 
 <div class="space-y-6">
   <!-- Back button -->
-  <a href="/admin/users" class="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-500 hover:text-white transition">
+  <a href="/admin/users" class="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-500 hover:text-foreground transition">
     <ChevronLeft class="h-4 w-4" />
     <span>Back to Users</span>
   </a>
@@ -46,7 +46,7 @@
   {/if}
 
   <!-- Header Banner -->
-  <div class="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+  <div class="rounded-2xl border border-border bg-background/40 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
     <div>
       <span class="text-[9px] font-black tracking-widest text-neutral-500 uppercase">Player Account Console</span>
       <h2 class="text-xl font-black text-neutral-100 mt-1">{data.targetProfile.username}</h2>
@@ -63,8 +63,8 @@
     <!-- Left Panel: Profile settings and security -->
     <div class="space-y-6">
       <!-- Form: Permissions and Loyalty Tier -->
-      <div class="rounded-xl border border-neutral-800 bg-neutral-900/20 p-5 space-y-4">
-        <h3 class="text-xs font-black text-neutral-200 uppercase tracking-widest border-b border-neutral-800 pb-2">Modify Status</h3>
+      <div class="rounded-xl border border-border bg-background/20 p-5 space-y-4">
+        <h3 class="text-xs font-black text-foreground uppercase tracking-widest border-b border-border pb-2">Modify Status</h3>
         <form 
           method="POST" 
           action="?/updateProfile"
@@ -79,7 +79,7 @@
         >
           <div class="space-y-1">
             <label for="role" class="text-xs font-bold text-neutral-500">System Role</label>
-            <select id="role" name="role" value={data.targetProfile.user.role} class="flex h-10 w-full rounded-md border border-neutral-800 bg-neutral-950 px-3 py-2 text-xs font-semibold text-neutral-400 focus:border-red-500 focus:outline-none">
+            <select id="role" name="role" value={data.targetProfile.user.role} class="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-xs font-semibold text-muted-foreground focus:border-red-500 focus:outline-none">
               <option value="PLAYER">PLAYER</option>
               <option value="SUPPORT">SUPPORT</option>
               <option value="ADMIN">ADMIN</option>
@@ -88,20 +88,20 @@
 
           <div class="space-y-1">
             <label for="vipTierId" class="text-xs font-bold text-neutral-500">VIP Loyalty Level</label>
-            <select id="vipTierId" name="vipTierId" value={data.targetProfile.vipTierId} class="flex h-10 w-full rounded-md border border-neutral-800 bg-neutral-950 px-3 py-2 text-xs font-semibold text-neutral-400 focus:border-red-500 focus:outline-none">
+            <select id="vipTierId" name="vipTierId" value={data.targetProfile.vipTierId} class="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-xs font-semibold text-muted-foreground focus:border-red-500 focus:outline-none">
               {#each data.vipTiers as tier}
                 <option value={tier.id}>{tier.name} (Min: {tier.minPoints})</option>
               {/each}
             </select>
           </div>
 
-          <Button type="submit" disabled={isSubmitting} class="w-full bg-red-600 hover:bg-red-500 text-white font-bold h-10 rounded-lg text-xs">Save Status</Button>
+          <Button type="submit" disabled={isSubmitting} class="w-full bg-red-600 hover:bg-red-500 text-foreground font-bold h-10 rounded-lg text-xs">Save Status</Button>
         </form>
       </div>
 
       <!-- Form: Password reset override -->
-      <div class="rounded-xl border border-neutral-800 bg-neutral-900/20 p-5 space-y-4">
-        <h3 class="text-xs font-black text-neutral-200 uppercase tracking-widest border-b border-neutral-800 pb-2 flex items-center gap-1.5">
+      <div class="rounded-xl border border-border bg-background/20 p-5 space-y-4">
+        <h3 class="text-xs font-black text-foreground uppercase tracking-widest border-b border-border pb-2 flex items-center gap-1.5">
           <KeyRound class="h-4 w-4 text-red-500" />
           <span>Reset Password</span>
         </h3>
@@ -119,15 +119,15 @@
         >
           <div class="space-y-1.5">
             <label for="newPassword" class="text-xs font-bold text-neutral-500">New Password</label>
-            <Input id="newPassword" name="newPassword" type="password" required placeholder="••••••••" disabled={isSubmitting} class="bg-neutral-950 border-neutral-800 focus:border-red-500 text-xs h-10 font-medium text-neutral-200" />
+            <Input id="newPassword" name="newPassword" type="password" required placeholder="••••••••" disabled={isSubmitting} class="bg-background border-border focus:border-red-500 text-xs h-10 font-medium text-foreground" />
           </div>
-          <Button type="submit" disabled={isSubmitting} class="w-full bg-red-600 hover:bg-red-500 text-white font-bold h-10 rounded-lg text-xs">Reset Password</Button>
+          <Button type="submit" disabled={isSubmitting} class="w-full bg-red-600 hover:bg-red-500 text-foreground font-bold h-10 rounded-lg text-xs">Reset Password</Button>
         </form>
       </div>
 
       <!-- Form: Balance Adjustment -->
-      <div class="rounded-xl border border-neutral-800 bg-neutral-900/20 p-5 space-y-4">
-        <h3 class="text-xs font-black text-neutral-200 uppercase tracking-widest border-b border-neutral-800 pb-2 flex items-center gap-1.5">
+      <div class="rounded-xl border border-border bg-background/20 p-5 space-y-4">
+        <h3 class="text-xs font-black text-foreground uppercase tracking-widest border-b border-border pb-2 flex items-center gap-1.5">
           <Coins class="h-4 w-4 text-red-500" />
           <span>Balance Adjustment</span>
         </h3>
@@ -145,7 +145,7 @@
         >
           <div class="space-y-1">
             <label for="type" class="text-xs font-bold text-neutral-500">Adjustment Type</label>
-            <select id="type" name="type" required class="flex h-10 w-full rounded-md border border-neutral-800 bg-neutral-950 px-3 py-2 text-xs font-semibold text-neutral-400 focus:border-red-500 focus:outline-none">
+            <select id="type" name="type" required class="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-xs font-semibold text-muted-foreground focus:border-red-500 focus:outline-none">
               <option value="DEPOSIT">DEPOSIT (Add Credit)</option>
               <option value="WITHDRAWAL">WITHDRAWAL (Deduct Debit)</option>
             </select>
@@ -153,10 +153,10 @@
 
           <div class="space-y-1.5">
             <label for="amount" class="text-xs font-bold text-neutral-500">Amount</label>
-            <Input id="amount" name="amount" type="number" step="0.01" required placeholder="500" disabled={isSubmitting} class="bg-neutral-950 border-neutral-800 focus:border-red-500 text-xs h-10 font-medium text-neutral-200" />
+            <Input id="amount" name="amount" type="number" step="0.01" required placeholder="500" disabled={isSubmitting} class="bg-background border-border focus:border-red-500 text-xs h-10 font-medium text-foreground" />
           </div>
 
-          <Button type="submit" disabled={isSubmitting} class="w-full bg-red-600 hover:bg-red-500 text-white font-bold h-10 rounded-lg text-xs">Process Adjustment</Button>
+          <Button type="submit" disabled={isSubmitting} class="w-full bg-red-600 hover:bg-red-500 text-foreground font-bold h-10 rounded-lg text-xs">Process Adjustment</Button>
         </form>
       </div>
     </div>
@@ -164,12 +164,12 @@
     <!-- Right Panel: Tabbed history logs (bets vs transactions) -->
     <div class="lg:col-span-2 space-y-4">
       <!-- Tabs header buttons -->
-      <div class="flex items-center gap-1.5 rounded-xl border border-neutral-800 bg-neutral-900/20 p-1.5 w-full sm:w-auto">
+      <div class="flex items-center gap-1.5 rounded-xl border border-border bg-background/20 p-1.5 w-full sm:w-auto">
         <Button
           variant="ghost"
           onclick={() => activeTab = 'bets'}
           class="h-9 flex-1 sm:flex-initial rounded-lg px-4 text-xs font-bold transition-all duration-150 gap-1.5
-            {activeTab === 'bets' ? 'bg-neutral-800 text-red-500' : 'text-neutral-400 hover:text-white'}"
+            {activeTab === 'bets' ? 'bg-background text-red-500' : 'text-muted-foreground hover:text-foreground'}"
         >
           <Ticket class="h-4 w-4" />
           Bets History
@@ -178,7 +178,7 @@
           variant="ghost"
           onclick={() => activeTab = 'transactions'}
           class="h-9 flex-1 sm:flex-initial rounded-lg px-4 text-xs font-bold transition-all duration-150 gap-1.5
-            {activeTab === 'transactions' ? 'bg-neutral-800 text-red-500' : 'text-neutral-400 hover:text-white'}"
+            {activeTab === 'transactions' ? 'bg-background text-red-500' : 'text-muted-foreground hover:text-foreground'}"
         >
           <History class="h-4 w-4" />
           Transactions Ledger
@@ -188,16 +188,16 @@
       <!-- Tab Content: Bets -->
       {#if activeTab === 'bets'}
         {#if data.bets.length === 0}
-          <div class="text-center text-xs font-semibold text-neutral-600 py-16 border border-dashed border-neutral-800 rounded-lg">
+          <div class="text-center text-xs font-semibold text-neutral-600 py-16 border border-dashed border-border rounded-lg">
             No registered wagers logged for this player.
           </div>
         {:else}
           <div class="space-y-3">
             {#each data.bets as bet}
-              <div class="rounded-xl border border-neutral-800 bg-neutral-900/40 p-4 flex justify-between items-center gap-4">
+              <div class="rounded-xl border border-border bg-background/40 p-4 flex justify-between items-center gap-4">
                 <div class="space-y-1">
                   <div class="flex items-center gap-2">
-                    <span class="text-xs font-bold text-neutral-200">{bet.game.homeTeam} vs {bet.game.awayTeam}</span>
+                    <span class="text-xs font-bold text-foreground">{bet.game.homeTeam} vs {bet.game.awayTeam}</span>
                     <Badge class="border text-[8px] font-bold px-1.5 py-0 rounded {getStatusClass(bet.status)}">
                       {bet.status}
                     </Badge>
@@ -207,7 +207,7 @@
                     Odds: {bet.odds.toFixed(2)} &bull; 
                     Placed {formatGameTime(bet.createdAt)}
                   </div>
-                  <div class="text-[10px] text-neutral-400 font-bold">
+                  <div class="text-[10px] text-muted-foreground font-bold">
                     Stake: {formatCurrency(bet.stake, 'USD')} &bull; 
                     Payout: <span class="text-emerald-500">{formatCurrency(bet.potentialWin, 'USD')}</span>
                   </div>
@@ -219,15 +219,15 @@
       {:else}
         <!-- Tab Content: Transactions -->
         {#if data.transactions.length === 0}
-          <div class="text-center text-xs font-semibold text-neutral-600 py-16 border border-dashed border-neutral-800 rounded-lg">
+          <div class="text-center text-xs font-semibold text-neutral-600 py-16 border border-dashed border-border rounded-lg">
             No transaction records in this player's ledger.
           </div>
         {:else}
           <div class="space-y-2">
             {#each data.transactions as tx}
-              <div class="flex items-center justify-between border border-neutral-800 bg-neutral-900/40 p-3.5 rounded-xl">
+              <div class="flex items-center justify-between border border-border bg-background/40 p-3.5 rounded-xl">
                 <div>
-                  <div class="text-xs font-bold text-neutral-200">{tx.type}</div>
+                  <div class="text-xs font-bold text-foreground">{tx.type}</div>
                   <div class="text-[10px] text-neutral-500 mt-1">Ref: {tx.reference} &bull; {formatGameTime(tx.createdAt)}</div>
                 </div>
 

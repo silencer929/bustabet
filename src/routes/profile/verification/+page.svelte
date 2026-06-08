@@ -23,7 +23,7 @@
 
 <div class="space-y-6">
   <!-- Back button -->
-  <a href="/profile" class="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-400 hover:text-white transition">
+  <a href="/profile" class="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition">
     <ChevronLeft class="h-4 w-4" />
     <span>Back to Profile</span>
   </a>
@@ -31,7 +31,7 @@
   <!-- Layout Container -->
   <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
     <!-- KYC File Upload Card -->
-    <div class="rounded-2xl border border-neutral-800 bg-neutral-900/60 p-6 space-y-6">
+    <div class="rounded-2xl border border-border bg-background/60 p-6 space-y-6">
       <div class="space-y-1.5">
         <h2 class="text-base font-black text-neutral-100 flex items-center gap-2">
           <FileUp class="h-5 w-5 text-amber-500" />
@@ -68,8 +68,8 @@
 
         <!-- Selector -->
         <div class="space-y-1.5">
-          <label for="documentType" class="text-xs font-bold text-neutral-400">Document Type</label>
-          <select id="documentType" name="documentType" required class="flex h-10 w-full rounded-md border border-neutral-800 bg-neutral-950 px-3 py-2 text-xs font-semibold text-neutral-200 focus:border-amber-500 focus:outline-none">
+          <label for="documentType" class="text-xs font-bold text-muted-foreground">Document Type</label>
+          <select id="documentType" name="documentType" required class="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-xs font-semibold text-foreground focus:border-amber-500 focus:outline-none">
             <option value="NATIONAL_ID">National ID Card</option>
             <option value="PASSPORT">International Passport</option>
             <option value="DRIVING_LICENSE">Driving License</option>
@@ -78,8 +78,8 @@
 
         <!-- Binary File input -->
         <div class="space-y-1.5">
-          <label for="file" class="text-xs font-bold text-neutral-400">Select Document File (JPG, PNG, PDF)</label>
-          <input id="file" name="file" type="file" required accept="image/*,application/pdf" class="flex w-full rounded-md border border-neutral-800 bg-neutral-950 px-3 py-2 text-xs font-semibold text-neutral-400 file:border-0 file:bg-transparent file:text-xs file:font-black file:text-amber-500 focus:outline-none" />
+          <label for="file" class="text-xs font-bold text-muted-foreground">Select Document File (JPG, PNG, PDF)</label>
+          <input id="file" name="file" type="file" required accept="image/*,application/pdf" class="flex w-full rounded-md border border-border bg-background px-3 py-2 text-xs font-semibold text-muted-foreground file:border-0 file:bg-transparent file:text-xs file:font-black file:text-amber-500 focus:outline-none" />
         </div>
 
         <Button 
@@ -97,19 +97,19 @@
       <h3 class="text-xs font-black tracking-widest text-neutral-500 uppercase">Uploaded History</h3>
 
       {#if data.documents.length === 0}
-        <div class="text-center text-xs font-semibold text-neutral-600 py-16 border border-dashed border-neutral-800 rounded-lg">
+        <div class="text-center text-xs font-semibold text-neutral-600 py-16 border border-dashed border-border rounded-lg">
           No verification documents submitted yet
         </div>
       {:else}
         <div class="space-y-2">
           {#each data.documents as doc}
-            <div class="flex items-center justify-between border border-neutral-800 bg-neutral-900/40 p-4 rounded-xl">
+            <div class="flex items-center justify-between border border-border bg-background/40 p-4 rounded-xl">
               <div class="flex items-center gap-3">
-                <div class="rounded-lg bg-neutral-900 p-2.5 border border-neutral-800 text-neutral-400">
+                <div class="rounded-lg bg-background p-2.5 border border-border text-muted-foreground">
                   <FileText class="h-4 w-4 text-amber-500" />
                 </div>
                 <div>
-                  <div class="text-xs font-bold text-neutral-200">{doc.documentType.replace('_', ' ')}</div>
+                  <div class="text-xs font-bold text-foreground">{doc.documentType.replace('_', ' ')}</div>
                   <div class="text-[10px] text-neutral-500 mt-1">Submitted {formatGameTime(doc.submittedAt)}</div>
                 </div>
               </div>

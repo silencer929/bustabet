@@ -27,18 +27,18 @@
 
 <div class="space-y-6">
   <!-- Back Button Navigation -->
-  <a href="/sportsbook" class="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-400 hover:text-white transition">
+  <a href="/sportsbook" class="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition">
     <ChevronLeft class="h-4 w-4" />
     <span>Back to matches</span>
   </a>
 
   <!-- Hero Scoreboard Details Display -->
-  <div class="relative overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6 md:p-8 text-center space-y-6">
+  <div class="relative overflow-hidden rounded-2xl border border-border bg-background/40 p-6 md:p-8 text-center space-y-6">
     <div class="text-[10px] font-black tracking-widest text-neutral-500 uppercase">{data.game.league}</div>
     
     <div class="flex items-center justify-center gap-6 md:gap-12">
       <div class="text-base md:text-xl font-black text-neutral-100">{data.game.homeTeam}</div>
-      <div class="text-xs font-black tracking-widest text-amber-500 uppercase px-3 py-1 bg-neutral-900 border border-neutral-800 rounded-full">VS</div>
+      <div class="text-xs font-black tracking-widest text-amber-500 uppercase px-3 py-1 bg-background border border-border rounded-full">VS</div>
       <div class="text-base md:text-xl font-black text-neutral-100">{data.game.awayTeam}</div>
     </div>
 
@@ -68,10 +68,10 @@
     <div class="text-xs font-black tracking-widest text-neutral-500 uppercase">More Markets</div>
 
     <!-- Accordion: Double Chance -->
-    <div class="rounded-xl border border-neutral-800 bg-neutral-900/20 overflow-hidden">
+    <div class="rounded-xl border border-border bg-background/20 overflow-hidden">
       <button 
         onclick={() => toggleDrawer('double_chance')}
-        class="flex w-full items-center justify-between p-4 text-xs font-bold text-neutral-200 bg-neutral-900/60 hover:bg-neutral-900 transition"
+        class="flex w-full items-center justify-between p-4 text-xs font-bold text-foreground bg-background/60 hover:bg-background transition"
       >
         <span>Double Chance</span>
         {#if openDrawers.double_chance}
@@ -82,7 +82,7 @@
       </button>
 
       {#if openDrawers.double_chance}
-        <div class="p-4 border-t border-neutral-800/60">
+        <div class="p-4 border-t border-border/60">
           {#if doubleChanceMarkets.length > 0}
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {#each doubleChanceMarkets as market}
@@ -105,10 +105,10 @@
     </div>
 
     <!-- Accordion: Draw No Bet -->
-    <div class="rounded-xl border border-neutral-800 bg-neutral-900/20 overflow-hidden">
+    <div class="rounded-xl border border-border bg-background/20 overflow-hidden">
       <button 
         onclick={() => toggleDrawer('draw_no_bet')}
-        class="flex w-full items-center justify-between p-4 text-xs font-bold text-neutral-200 bg-neutral-900/60 hover:bg-neutral-900 transition"
+        class="flex w-full items-center justify-between p-4 text-xs font-bold text-foreground bg-background/60 hover:bg-background transition"
       >
         <span>Draw No Bet</span>
         {#if openDrawers.draw_no_bet}
@@ -119,7 +119,7 @@
       </button>
 
       {#if openDrawers.draw_no_bet}
-        <div class="p-4 border-t border-neutral-800/60">
+        <div class="p-4 border-t border-border/60">
           {#if drawNoBetMarkets.length > 0}
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {#each drawNoBetMarkets as market}
@@ -142,10 +142,10 @@
     </div>
 
     <!-- Accordion: Over / Under Goals -->
-    <div class="rounded-xl border border-neutral-800 bg-neutral-900/20 overflow-hidden">
+    <div class="rounded-xl border border-border bg-background/20 overflow-hidden">
       <button 
         onclick={() => toggleDrawer('over_under')}
-        class="flex w-full items-center justify-between p-4 text-xs font-bold text-neutral-200 bg-neutral-900/60 hover:bg-neutral-900 transition"
+        class="flex w-full items-center justify-between p-4 text-xs font-bold text-foreground bg-background/60 hover:bg-background transition"
       >
         <span>Over / Under Goals</span>
         {#if openDrawers.over_under}
@@ -156,7 +156,7 @@
       </button>
 
       {#if openDrawers.over_under}
-        <div class="p-4 border-t border-neutral-800/60">
+        <div class="p-4 border-t border-border/60">
           {#if overUnderMarkets.length > 0}
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {#each overUnderMarkets as market}

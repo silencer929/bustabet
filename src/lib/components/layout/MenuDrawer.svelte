@@ -42,13 +42,13 @@
   ></button>
 {/if}
 
-<aside class="fixed top-0 bottom-0 right-0 z-50 w-72 border-l border-neutral-800 bg-neutral-950 px-5 py-6 shadow-2xl transition-transform duration-300
+<aside class="fixed top-0 bottom-0 right-0 z-50 w-72 border-l border-border bg-background px-5 py-6 shadow-2xl transition-transform duration-300
   {isOpen ? 'translate-x-0' : 'translate-x-full'}"
 >
   <!-- Drawer Header -->
-  <div class="flex items-center justify-between border-b border-neutral-800 pb-4 mb-6">
-    <span class="text-xs font-black tracking-widest text-neutral-400 uppercase">Navigation</span>
-    <button onclick={() => isOpen = false} class="text-neutral-500 hover:text-white transition">
+  <div class="flex items-center justify-between border-b border-border pb-4 mb-6">
+    <span class="text-xs font-black tracking-widest text-muted-foreground uppercase">Navigation</span>
+    <button onclick={() => isOpen = false} class="text-neutral-500 hover:text-foreground transition">
       <X class="h-5 w-5" />
     </button>
   </div>
@@ -61,7 +61,7 @@
           href={item.path} 
           onclick={() => isOpen = false}
           class="flex h-11 items-center justify-between rounded-lg px-3 py-2 text-xs font-bold tracking-wide transition-all duration-200
-            {isActive(item.path) ? 'bg-amber-500 text-neutral-950 font-black' : 'text-neutral-400 hover:bg-neutral-900/60 hover:text-white'}"
+            {isActive(item.path) ? 'bg-amber-500 text-neutral-950 font-black' : 'text-muted-foreground hover:bg-background/60 hover:text-foreground'}"
         >
           <div class="flex items-center gap-3">
             <item.icon class="h-4 w-4" />
@@ -72,13 +72,13 @@
       {/each}
 
       {#if auth.isAdmin}
-        <div class="border-t border-neutral-800 my-4 pt-4">
+        <div class="border-t border-border my-4 pt-4">
           <div class="px-3 mb-2 text-[10px] font-black tracking-widest text-neutral-500 uppercase">Management</div>
           <a 
             href="/admin/dashboard" 
             onclick={() => isOpen = false}
             class="flex h-11 items-center justify-between rounded-lg px-3 py-2 text-xs font-bold tracking-wide transition-all duration-200
-              {isActive('/admin') ? 'bg-red-600 text-white' : 'text-red-400 hover:bg-red-950/20 hover:text-red-300'}"
+              {isActive('/admin') ? 'bg-red-600 text-foreground' : 'text-red-400 hover:bg-red-950/20 hover:text-red-300'}"
           >
             <div class="flex items-center gap-3">
               <Shield class="h-4 w-4" />
@@ -104,12 +104,12 @@
             update();
           };
         }}
-        class="border-t border-neutral-800 pt-4"
+        class="border-t border-border pt-4"
       >
         <Button 
           type="submit"
           variant="ghost" 
-          class="flex h-11 w-full items-center justify-start gap-3 rounded-lg px-3 py-2 text-xs font-bold text-neutral-400 hover:bg-red-950/10 hover:text-red-400 transition"
+          class="flex h-11 w-full items-center justify-start gap-3 rounded-lg px-3 py-2 text-xs font-bold text-muted-foreground hover:bg-red-950/10 hover:text-red-400 transition"
         >
           <LogOut class="h-4 w-4" />
           <span>Log Out</span>

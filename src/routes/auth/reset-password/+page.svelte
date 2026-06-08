@@ -14,7 +14,7 @@
 </script>
 
 <div class="flex min-h-[calc(100vh-12rem)] items-center justify-center px-4 py-8">
-  <div class="w-full max-w-md rounded-2xl border border-neutral-800 bg-neutral-900/60 p-6 shadow-xl backdrop-blur-md space-y-6">
+  <div class="w-full max-w-md rounded-2xl border border-border bg-background/60 p-6 shadow-xl backdrop-blur-md space-y-6">
     <!-- Header Title -->
     <div class="text-center space-y-1.5">
       <h2 class="text-2xl font-black tracking-tight text-neutral-100 flex items-center justify-center gap-2">
@@ -79,7 +79,7 @@
           <input type="hidden" name="token" value={data.token} />
 
           <div class="space-y-1.5">
-            <label for="password" class="text-xs font-bold text-neutral-400">New Password</label>
+            <label for="password" class="text-xs font-bold text-muted-foreground">New Password</label>
             <Input 
               id="password" 
               name="password" 
@@ -87,12 +87,12 @@
               required 
               placeholder="••••••••" 
               disabled={isSubmitting}
-              class="bg-neutral-950 border-neutral-800 focus:border-amber-500 text-xs h-10 font-medium text-neutral-200" 
+              class="bg-background border-border focus:border-amber-500 text-xs h-10 font-medium text-foreground" 
             />
           </div>
 
           <div class="space-y-1.5">
-            <label for="confirmPassword" class="text-xs font-bold text-neutral-400">Confirm New Password</label>
+            <label for="confirmPassword" class="text-xs font-bold text-muted-foreground">Confirm New Password</label>
             <Input 
               id="confirmPassword" 
               name="confirmPassword" 
@@ -100,7 +100,7 @@
               required 
               placeholder="••••••••" 
               disabled={isSubmitting}
-              class="bg-neutral-950 border-neutral-800 focus:border-amber-500 text-xs h-10 font-medium text-neutral-200" 
+              class="bg-background border-border focus:border-amber-500 text-xs h-10 font-medium text-foreground" 
             />
           </div>
 
@@ -108,7 +108,7 @@
           <Button 
             type="submit" 
             disabled={isSubmitting}
-            class="w-full h-11 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-black rounded-lg shadow-md transition disabled:bg-neutral-800 disabled:text-neutral-500"
+            class="w-full h-11 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-black rounded-lg shadow-md transition disabled:bg-background disabled:text-neutral-500"
           >
             {isSubmitting ? 'Resetting Password...' : 'Save New Password'}
           </Button>

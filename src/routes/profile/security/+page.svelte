@@ -11,12 +11,12 @@
 
 <div class="space-y-6 max-w-lg mx-auto">
   <!-- Back button -->
-  <a href="/profile" class="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-400 hover:text-white transition">
+  <a href="/profile" class="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition">
     <ChevronLeft class="h-4 w-4" />
     <span>Back to Profile</span>
   </a>
 
-  <div class="rounded-2xl border border-neutral-800 bg-neutral-900/60 p-6 space-y-6">
+  <div class="rounded-2xl border border-border bg-background/60 p-6 space-y-6">
     <div class="text-center space-y-1.5">
       <h2 class="text-2xl font-black text-neutral-100 flex items-center justify-center gap-2">
         <KeyRound class="h-5 w-5 text-amber-500" />
@@ -50,18 +50,18 @@
       {/if}
 
       <div class="space-y-1.5">
-        <label for="currentPassword" class="text-xs font-bold text-neutral-400">Current Password</label>
-        <Input id="currentPassword" name="currentPassword" type="password" required placeholder="••••••••" disabled={isSubmitting} class="bg-neutral-950 border-neutral-800 focus:border-amber-500 text-xs h-10 font-medium text-neutral-200" />
+        <label for="currentPassword" class="text-xs font-bold text-muted-foreground">Current Password</label>
+        <Input id="currentPassword" name="currentPassword" type="password" required placeholder="••••••••" disabled={isSubmitting} class="bg-background border-border focus:border-amber-500 text-xs h-10 font-medium text-foreground" />
       </div>
 
       <div class="space-y-1.5">
-        <label for="newPassword" class="text-xs font-bold text-neutral-400">New Password</label>
-        <Input id="newPassword" name="newPassword" type="password" required placeholder="••••••••" disabled={isSubmitting} class="bg-neutral-950 border-neutral-800 focus:border-amber-500 text-xs h-10 font-medium text-neutral-200" />
+        <label for="newPassword" class="text-xs font-bold text-muted-foreground">New Password</label>
+        <Input id="newPassword" name="newPassword" type="password" required placeholder="••••••••" disabled={isSubmitting} class="bg-background border-border focus:border-amber-500 text-xs h-10 font-medium text-foreground" />
       </div>
 
       <div class="space-y-1.5">
-        <label for="confirmPassword" class="text-xs font-bold text-neutral-400">Confirm New Password</label>
-        <Input id="confirmPassword" name="confirmPassword" type="password" required placeholder="••••••••" disabled={isSubmitting} class="bg-neutral-950 border-neutral-800 focus:border-amber-500 text-xs h-10 font-medium text-neutral-200" />
+        <label for="confirmPassword" class="text-xs font-bold text-muted-foreground">Confirm New Password</label>
+        <Input id="confirmPassword" name="confirmPassword" type="password" required placeholder="••••••••" disabled={isSubmitting} class="bg-background border-border focus:border-amber-500 text-xs h-10 font-medium text-foreground" />
       </div>
 
       <Button 

@@ -21,9 +21,9 @@
 
 <div class="space-y-6 max-w-4xl mx-auto">
   <!-- Back Button & Header Metadata -->
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-800/80 pb-4">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/80 pb-4">
     <div class="space-y-1">
-      <a href="/support" class="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-400 hover:text-white transition mb-1">
+      <a href="/support" class="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition mb-1">
         <ChevronLeft class="h-4 w-4" />
         <span>Back to Tickets</span>
       </a>
@@ -33,7 +33,7 @@
     <div class="flex items-center gap-3">
       <span class="text-[10px] font-bold text-neutral-500 tracking-wider">Ref: {data.conversation.id}</span>
       <Badge class="border text-[9px] font-bold px-2 py-0.5 rounded
-        {data.conversation.status === 'CLOSED' ? 'bg-neutral-800 text-neutral-400 border-neutral-700' : 'bg-emerald-950/40 text-emerald-400 border-emerald-800/80'}"
+        {data.conversation.status === 'CLOSED' ? 'bg-background text-muted-foreground border-neutral-700' : 'bg-emerald-950/40 text-emerald-400 border-emerald-800/80'}"
       >
         {data.conversation.status}
       </Badge>
@@ -47,12 +47,12 @@
       <div class="flex w-full {isMe ? 'justify-end' : 'justify-start'}">
         <div class="max-w-[80%] rounded-2xl p-4 space-y-1.5 border
           {isMe 
-            ? 'bg-neutral-900 border-neutral-800 text-neutral-200 rounded-tr-none' 
-            : 'bg-neutral-950 border-amber-500/20 text-neutral-300 rounded-tl-none'}"
+            ? 'bg-background border-border text-foreground rounded-tr-none' 
+            : 'bg-background border-amber-500/20 text-neutral-300 rounded-tl-none'}"
         >
           <!-- Sender details -->
           <div class="flex items-center gap-2">
-            <span class="text-[10px] font-black tracking-wide {isMe ? 'text-neutral-400' : 'text-amber-500'}">
+            <span class="text-[10px] font-black tracking-wide {isMe ? 'text-muted-foreground' : 'text-amber-500'}">
               {isMe ? 'You' : message.sender.username}
             </span>
             {#if !isMe && message.sender.role === 'ADMIN'}
@@ -69,7 +69,7 @@
 
   <!-- Reply Input Panel (Visible only if the ticket remains open) -->
   {#if isClosed}
-    <div class="rounded-xl bg-neutral-950 border border-neutral-800/80 p-4 text-center text-xs font-semibold text-neutral-500">
+    <div class="rounded-xl bg-background border border-border/80 p-4 text-center text-xs font-semibold text-neutral-500">
       This support ticket has been closed. If you require further assistance, please open a new ticket.
     </div>
   {:else}
@@ -100,12 +100,12 @@
           bind:value={replyText}
           disabled={isSubmitting}
           placeholder="Type your reply here..." 
-          class="bg-neutral-950 border-neutral-800 focus:border-amber-500 text-xs h-11 font-medium text-neutral-200" 
+          class="bg-background border-border focus:border-amber-500 text-xs h-11 font-medium text-foreground" 
         />
         <Button 
           type="submit" 
           disabled={isSubmitting || replyText.trim().length === 0}
-          class="h-11 px-5 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-black rounded-lg gap-1.5 shadow-md disabled:bg-neutral-800"
+          class="h-11 px-5 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-black rounded-lg gap-1.5 shadow-md disabled:bg-background"
         >
           <Send class="h-4 w-4" />
           <span class="hidden sm:inline">Send</span>

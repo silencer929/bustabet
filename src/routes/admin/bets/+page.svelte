@@ -44,7 +44,7 @@
 
 <div class="space-y-6">
   <!-- Page Header -->
-  <div class="flex items-center gap-2 border-b border-neutral-800/80 pb-3">
+  <div class="flex items-center gap-2 border-b border-border/80 pb-3">
     <Ticket class="h-5 w-5 text-red-500" />
     <h1 class="text-base font-black uppercase tracking-wider text-neutral-100">Wagers Overwatch</h1>
   </div>
@@ -57,21 +57,21 @@
   {/if}
 
   <!-- Interactive Filters Panel -->
-  <div class="rounded-xl border border-neutral-800 bg-neutral-900/20 p-4 flex flex-col sm:flex-row items-center gap-3">
+  <div class="rounded-xl border border-border bg-background/20 p-4 flex flex-col sm:flex-row items-center gap-3">
     <div class="relative w-full sm:flex-1">
       <Search class="absolute left-3 top-3 h-4 w-4 text-neutral-500" />
       <Input 
         type="text" 
         bind:value={searchQuery}
         placeholder="Search by player or team matchups..." 
-        class="h-10 w-full pl-9 bg-neutral-950 border-neutral-800 focus:border-red-500 text-xs font-semibold text-neutral-200"
+        class="h-10 w-full pl-9 bg-background border-border focus:border-red-500 text-xs font-semibold text-foreground"
       />
     </div>
 
     <!-- Status Dropdown Selector -->
     <select 
       bind:value={selectedStatus}
-      class="flex h-10 w-full sm:w-40 rounded-md border border-neutral-800 bg-neutral-950 px-3 py-2 text-xs font-semibold text-neutral-400 focus:border-red-500 focus:outline-none"
+      class="flex h-10 w-full sm:w-40 rounded-md border border-border bg-background px-3 py-2 text-xs font-semibold text-muted-foreground focus:border-red-500 focus:outline-none"
     >
       <option value="all">All Wagers</option>
       <option value="PENDING">Pending</option>
@@ -89,17 +89,17 @@
     </div>
 
     {#if filteredBets.length === 0}
-      <div class="text-center text-xs font-semibold text-neutral-600 py-16 border border-dashed border-neutral-800 rounded-lg">
+      <div class="text-center text-xs font-semibold text-neutral-600 py-16 border border-dashed border-border rounded-lg">
         No registered wagers match your active search filters.
       </div>
     {:else}
       <div class="space-y-3">
         {#each filteredBets as bet}
-          <div class="rounded-xl border border-neutral-800 bg-neutral-900/40 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="rounded-xl border border-border bg-background/40 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <!-- Wager Info Details -->
             <div class="space-y-1.5 flex-1">
               <div class="flex items-center gap-2">
-                <span class="text-xs font-black text-neutral-200">{bet.game.homeTeam} vs {bet.game.awayTeam}</span>
+                <span class="text-xs font-black text-foreground">{bet.game.homeTeam} vs {bet.game.awayTeam}</span>
                 <Badge class="border text-[8px] font-bold px-1.5 py-0 rounded {getStatusClass(bet.status)}">
                   {bet.status}
                 </Badge>
@@ -107,10 +107,10 @@
               <div class="text-[10px] text-neutral-500">
                 Player: <span class="text-neutral-300 font-bold">{bet.profile.username}</span> &bull; 
                 Selection: <span class="text-amber-500 font-black">{bet.market.selection}</span> &bull; 
-                Odds: <span class="text-neutral-400 font-bold">{bet.odds.toFixed(2)}</span> &bull; 
+                Odds: <span class="text-muted-foreground font-bold">{bet.odds.toFixed(2)}</span> &bull; 
                 Placed {formatGameTime(bet.createdAt)}
               </div>
-              <div class="text-xs font-bold text-neutral-400">
+              <div class="text-xs font-bold text-muted-foreground">
                 Stake: {formatCurrency(bet.stake, 'USD')} &bull; 
                 Potential Payout: <span class="text-emerald-500 font-black">{formatCurrency(bet.potentialWin, 'USD')}</span>
               </div>
@@ -118,7 +118,7 @@
 
             <!-- Manual Overrides Form Panel (Visible only if the bet is currently pending) -->
             {#if bet.status === 'PENDING'}
-              <div class="flex items-center gap-2 border-t md:border-t-0 border-neutral-800/60 pt-3 md:pt-0">
+              <div class="flex items-center gap-2 border-t md:border-t-0 border-border/60 pt-3 md:pt-0">
                 <!-- Settle Won Form -->
                 <form 
                   action="?/settleWon" 
@@ -135,7 +135,7 @@
                   <Button 
                     type="submit" 
                     disabled={isSubmitting}
-                    class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold h-9 px-3 rounded-lg text-xs gap-1.5"
+                    class="bg-emerald-600 hover:bg-emerald-500 text-foreground font-bold h-9 px-3 rounded-lg text-xs gap-1.5"
                     title="Settle as Won"
                   >
                     <Check class="h-3.5 w-3.5" />
@@ -160,7 +160,7 @@
                     type="submit" 
                     disabled={isSubmitting}
                     variant="outline"
-                    class="border-neutral-800 bg-neutral-950 text-neutral-200 hover:bg-neutral-900 hover:text-red-400 font-bold h-9 px-3 rounded-lg text-xs gap-1.5"
+                    class="border-border bg-background text-foreground hover:bg-background hover:text-red-400 font-bold h-9 px-3 rounded-lg text-xs gap-1.5"
                     title="Settle as Lost"
                   >
                     <X class="h-3.5 w-3.5" />
@@ -185,7 +185,7 @@
                     type="submit" 
                     disabled={isSubmitting}
                     variant="outline"
-                    class="border-neutral-800 bg-neutral-950 text-neutral-400 hover:text-neutral-300 font-bold h-9 px-3 rounded-lg text-xs gap-1.5"
+                    class="border-border bg-background text-muted-foreground hover:text-neutral-300 font-bold h-9 px-3 rounded-lg text-xs gap-1.5"
                     title="Void & Refund Stake"
                   >
                     <Ban class="h-3.5 w-3.5 text-red-500" />

@@ -24,14 +24,14 @@
     switch (role) {
       case 'ADMIN': return 'bg-red-950/40 text-red-400 border-red-800/80';
       case 'SUPPORT': return 'bg-blue-950/40 text-blue-400 border-blue-800/80';
-      default: return 'bg-neutral-800 text-neutral-400 border-neutral-700';
+      default: return 'bg-background text-muted-foreground border-neutral-700';
     }
   };
 </script>
 
 <div class="space-y-6">
   <!-- Page Header -->
-  <div class="flex items-center gap-2 border-b border-neutral-800/80 pb-3">
+  <div class="flex items-center gap-2 border-b border-border/80 pb-3">
     <Users class="h-5 w-5 text-red-500" />
     <h1 class="text-base font-black uppercase tracking-wider text-neutral-100">User Directory</h1>
   </div>
@@ -43,7 +43,7 @@
       type="text" 
       bind:value={searchQuery}
       placeholder="Search by username, email, or full name..." 
-      class="h-10 w-full pl-9 bg-neutral-900/40 border-neutral-800 focus:border-red-500 text-xs font-semibold text-neutral-200"
+      class="h-10 w-full pl-9 bg-background/40 border-border focus:border-red-500 text-xs font-semibold text-foreground"
     />
   </div>
 
@@ -55,7 +55,7 @@
     </div>
 
     {#if filteredProfiles.length === 0}
-      <div class="text-center text-xs font-semibold text-neutral-600 py-16 border border-dashed border-neutral-800 rounded-lg">
+      <div class="text-center text-xs font-semibold text-neutral-600 py-16 border border-dashed border-border rounded-lg">
         No registered player accounts match your active search filters.
       </div>
     {:else}
@@ -63,14 +63,14 @@
         {#each filteredProfiles as profile}
           <a 
             href="/admin/users/{profile.id}" 
-            class="flex items-center justify-between border border-neutral-800/80 bg-neutral-900/40 p-4 rounded-xl transition duration-150 hover:border-neutral-700"
+            class="flex items-center justify-between border border-border/80 bg-background/40 p-4 rounded-xl transition duration-150 hover:border-neutral-700"
           >
             <div class="flex items-center gap-4">
-              <div class="rounded-lg bg-neutral-950 p-2.5 border border-neutral-800 text-neutral-400">
+              <div class="rounded-lg bg-background p-2.5 border border-border text-muted-foreground">
                 <Users class="h-4 w-4 text-red-500" />
               </div>
               <div>
-                <div class="text-xs font-bold text-neutral-200">{profile.username} <span class="text-neutral-500">({profile.email})</span></div>
+                <div class="text-xs font-bold text-foreground">{profile.username} <span class="text-neutral-500">({profile.email})</span></div>
                 <div class="text-[10px] text-neutral-500 mt-1">Country: {profile.country || 'Not Set'} &bull; Registered {formatGameTime(profile.createdAt)}</div>
               </div>
             </div>

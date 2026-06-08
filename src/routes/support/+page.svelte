@@ -10,14 +10,14 @@
     switch (status) {
       case 'OPEN': return 'bg-emerald-950/40 text-emerald-400 border-emerald-800/80';
       case 'RESOLVED': return 'bg-blue-950/40 text-blue-400 border-blue-800/80';
-      default: return 'bg-neutral-800 text-neutral-400 border-neutral-700';
+      default: return 'bg-background text-muted-foreground border-neutral-700';
     }
   };
 </script>
 
 <div class="space-y-6">
   <!-- Page Header -->
-  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-800/80 pb-4">
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/80 pb-4">
     <div class="flex items-center gap-2">
       <HelpCircle class="h-5 w-5 text-amber-500" />
       <h1 class="text-base font-black uppercase tracking-wider text-neutral-100">Customer Support</h1>
@@ -33,11 +33,11 @@
 
   {#if data.tickets.length === 0}
     <!-- Empty State -->
-    <div class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-neutral-800 py-24 text-center">
-      <div class="rounded-full bg-neutral-900 p-4 border border-neutral-800 mb-4">
+    <div class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border py-24 text-center">
+      <div class="rounded-full bg-background p-4 border border-border mb-4">
         <HelpCircle class="h-8 w-8 text-neutral-600" />
       </div>
-      <h2 class="text-lg font-black text-neutral-400">No Tickets</h2>
+      <h2 class="text-lg font-black text-muted-foreground">No Tickets</h2>
       <p class="text-xs text-neutral-600 mt-1 max-w-xs">You do not have any open or resolved support tickets at the moment.</p>
     </div>
   {:else}
@@ -46,14 +46,14 @@
       {#each data.tickets as ticket}
         <a 
           href="/support/{ticket.id}" 
-          class="flex items-center justify-between border border-neutral-800/80 bg-neutral-900/40 p-4 rounded-xl transition duration-150 hover:border-neutral-700"
+          class="flex items-center justify-between border border-border/80 bg-background/40 p-4 rounded-xl transition duration-150 hover:border-neutral-700"
         >
           <div class="flex items-center gap-4">
-            <div class="rounded-lg bg-neutral-900 p-2.5 border border-neutral-800 text-neutral-400">
+            <div class="rounded-lg bg-background p-2.5 border border-border text-muted-foreground">
               <MessageSquare class="h-4 w-4 text-amber-500" />
             </div>
             <div>
-              <div class="text-xs font-bold text-neutral-200">{ticket.subject}</div>
+              <div class="text-xs font-bold text-foreground">{ticket.subject}</div>
               <div class="text-[10px] text-neutral-500 mt-1">Ticket Reference: {ticket.id} &bull; Created {formatGameTime(ticket.createdAt)}</div>
             </div>
           </div>
