@@ -10,7 +10,7 @@
 
   // Filter to compute the queue of pending document uploads awaiting review
   const pendingDocs = $derived(
-    data.documents.filter((doc) => doc.status === 'PENDING')
+    data.documents.filter((doc: any) => doc.status === 'PENDING')
   );
 
   let isSubmitting = $state(false);

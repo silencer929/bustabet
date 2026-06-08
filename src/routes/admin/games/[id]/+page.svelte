@@ -15,10 +15,10 @@
   let isSubmitting = $state(false);
 
   // Group market items dynamically based on their category keys
-  const h2hMarkets = $derived(data.game.markets.filter((m) => m.marketName === 'h2h'));
-  const doubleChanceMarkets = $derived(data.game.markets.filter((m) => m.marketName === 'double_chance'));
-  const drawNoBetMarkets = $derived(data.game.markets.filter((m) => m.marketName === 'draw_no_bet'));
-  const overUnderMarkets = $derived(data.game.markets.filter((m) => m.marketName === 'over_under'));
+  const h2hMarkets = $derived(data.game.markets.filter((m: any) => m.marketName === 'h2h'));
+  const doubleChanceMarkets = $derived(data.game.markets.filter((m: any) => m.marketName === 'double_chance'));
+  const drawNoBetMarkets = $derived(data.game.markets.filter((m: any) => m.marketName === 'draw_no_bet'));
+  const overUnderMarkets = $derived(data.game.markets.filter((m: any) => m.marketName === 'over_under'));
 
   const getStatusClass = (status: string) => {
     switch (status) {

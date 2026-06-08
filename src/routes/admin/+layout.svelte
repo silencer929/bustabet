@@ -7,6 +7,7 @@
     ShieldCheck, 
     HelpCircle, 
     Tv,
+    Group,
     ArrowLeft,
     ChevronRight
   } from 'lucide-svelte';
@@ -19,6 +20,7 @@
 
   const adminNav = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
+    { name: 'User Management', path: '/admin/users', icon: Group },
     { name: 'Transactions', path: '/admin/transactions', icon: ArrowRightLeft },
     { name: 'KYC Verification', path: '/admin/verification', icon: ShieldCheck },
     { name: 'Support Tickets', path: '/admin/support', icon: HelpCircle },
