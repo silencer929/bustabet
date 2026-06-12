@@ -5,25 +5,30 @@ import {
   PAYHERO_CHANNEL_ID, 
   PAYHERO_CALLBACK_URL 
 } from '$env/static/private';
+import type { RowDataPacket } from 'mysql2';
 
 export class WalletService {
   // Computes active user balance: Deposits + Payouts - Completed/Pending Withdrawals - Pending Bets
   static async getBalance(profileId: string): Promise<number> {
-    const transactions = await db.transaction.groupBy({
-      by: ['type', 'status'],
-      where: { profileId },
-      _sum: { amount: true }
-    });
+    // Aggregate transactions by type and status
+    const [transactions] = await db.execute<RowDataPacket[]>(
+      `SELECT type, status, SUM(amount) as sumAmount 
+       FROM transactions 
+       WHERE profile_id = ? 
+       GROUP BY type, status`,
+      [profileId]
+    );
 
-    const pendingBets = await db.bet.aggregate({
-      where: { profileId, status: 'PENDING' },
-      _sum: { stake: true }
-    });
+    // Aggregate pending bet stakes
+    const [pendingBets] = await db.execute<RowDataPacket[]>(
+      "SELECT SUM(stake) as activeStakes FROM bets WHERE profile_id = ? AND status = 'PENDING'",
+      [profileId]
+    );
 
     let balance = 0;
 
     for (const group of transactions) {
-      const sum = Number(group._sum.amount || 0);
+      const sum = Number(group.sumAmount || 0);
       
       if (group.status === 'COMPLETED') {
         if (group.type === 'DEPOSIT' || group.type === 'PAYOUT') {
@@ -37,7 +42,7 @@ export class WalletService {
       }
     }
 
-    const activeStakes = Number(pendingBets._sum.stake || 0);
+    const activeStakes = Number(pendingBets[0].activeStakes || 0);
     balance -= activeStakes;
 
     return Number(balance.toFixed(2));
@@ -45,74 +50,79 @@ export class WalletService {
 
   // Initiates an M-Pesa STK Push deposit using the PayHero gateway API
   static async initiateMpesaDeposit(profileId: string, amount: number, phoneNumber: string): Promise<{ success: boolean; message: string; reference: string }> {
-    const profile = await db.profile.findUnique({ where: { id: profileId } });
-    if (!profile) throw new Error('User profile not found');
+    const [profiles] = await db.execute<RowDataPacket[]>(
+      'SELECT currency, full_name, username FROM profiles WHERE id = ? LIMIT 1',
+      [profileId]
+    );
+    if (profiles.length === 0) throw new Error('User profile not found');
+    const profile = profiles[0];
 
-    return await db.$transaction(async (tx) => {
+    const conn = await db.getConnection();
+    const transactionId = crypto.randomUUID();
+    const reference = 'PH-' + Math.random().toString(36).substring(2, 12).toUpperCase();
+
+    try {
+      await conn.beginTransaction();
+
       // Create a pending transaction record inside the local database
-      const transaction = await tx.transaction.create({
-        data: {
-          profileId,
-          type: 'DEPOSIT',
-          amount,
-          currency: profile.currency || 'KES',
-          status: 'PENDING',
-          reference: 'PH-' + Math.random().toString(36).substring(2, 12).toUpperCase()
-        }
-      });
+      await conn.execute(
+        `INSERT INTO transactions (id, profile_id, type, amount, currency, status, reference) 
+         VALUES (?, ?, 'DEPOSIT', ?, ?, 'PENDING', ?)`,
+        [transactionId, profileId, amount, profile.currency || 'KES', reference]
+      );
 
       const authHeader = 'Basic ' + Buffer.from(`${PAYHERO_API_USERNAME}:${PAYHERO_API_PASSWORD}`).toString('base64');
 
-      try {
-        const response = await fetch('https://backend.payhero.co.ke/api/v2/payments', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': authHeader
-          },
-          body: JSON.stringify({
-            amount: Math.round(amount),
-            phone_number: phoneNumber,
-            channel_id: Number(PAYHERO_CHANNEL_ID),
-            provider: 'm-pesa',
-            external_reference: transaction.reference,
-            callback_url: PAYHERO_CALLBACK_URL,
-            customer_name: profile.fullName || profile.username
-          })
-        });
+      const response = await fetch('https://backend.payhero.co.ke/api/v2/payments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': authHeader
+        },
+        body: JSON.stringify({
+          amount: Math.round(amount),
+          phone_number: phoneNumber,
+          channel_id: Number(PAYHERO_CHANNEL_ID),
+          provider: 'm-pesa',
+          external_reference: reference,
+          callback_url: PAYHERO_CALLBACK_URL,
+          customer_name: profile.full_name || profile.username
+        })
+      });
 
-        const result = await response.json();
+      const result = await response.json();
 
-        if (response.status === 201 && result.status === 'QUEUED') {
-          return {
-            success: true,
-            message: 'STK push prompt sent successfully to your device',
-            reference: transaction.reference
-          };
-        } else {
-          // Mark transaction as failed if PayHero rejects initiation
-          await tx.transaction.update({
-            where: { id: transaction.id },
-            data: { status: 'FAILED' }
-          });
-          return {
-            success: false,
-            message: result.message || 'Payment initiation failed',
-            reference: transaction.reference
-          };
-        }
-      } catch (error) {
-        await tx.transaction.update({
-          where: { id: transaction.id },
-          data: { status: 'FAILED' }
-        });
+      if (response.status === 201 && result.status === 'QUEUED') {
+        await conn.commit();
+        return {
+          success: true,
+          message: 'STK push prompt sent successfully to your device',
+          reference
+        };
+      } else {
+        // Mark transaction as failed if PayHero rejects initiation
+        await conn.execute(
+          'UPDATE transactions SET status = "FAILED" WHERE id = ?',
+          [transactionId]
+        );
+        await conn.commit();
         return {
           success: false,
-          message: 'An unexpected connection error occurred',
-          reference: transaction.reference
+          message: result.message || 'Payment initiation failed',
+          reference
         };
       }
-    });
+    } catch (error) {
+      await conn.rollback();
+      // Update local transaction status to FAILED on connection timeouts
+      await db.execute(
+        'UPDATE transactions SET status = "FAILED" WHERE id = ?',
+        [transactionId]
+      );
+      throw error;
+    } finally {
+      conn.release();
+    }
   }
 
   // Processes incoming secure transaction updates from PayHero webhook callbacks
@@ -122,38 +132,50 @@ export class WalletService {
     external_reference: string;
     MpesaCode?: string;
   }): Promise<boolean> {
-    const transaction = await db.transaction.findUnique({
-      where: { reference: payload.external_reference }
-    });
+    const [transactions] = await db.execute<RowDataPacket[]>(
+      'SELECT id, profile_id, currency, amount, status FROM transactions WHERE reference = ? LIMIT 1',
+      [payload.external_reference]
+    );
 
-    if (!transaction || transaction.status !== 'PENDING') return false;
+    if (transactions.length === 0 || transactions[0].status !== 'PENDING') return false;
+    const transaction = transactions[0];
 
-    await db.$transaction(async (tx) => {
+    const conn = await db.getConnection();
+
+    try {
+      await conn.beginTransaction();
+
       const finalStatus = payload.status === 'SUCCESS' ? 'COMPLETED' : 'FAILED';
-      const referenceCode = payload.MpesaCode || transaction.reference;
+      const referenceCode = payload.MpesaCode || payload.external_reference;
 
-      await tx.transaction.update({
-        where: { id: transaction.id },
-        data: {
-          status: finalStatus,
-          reference: referenceCode // Update temporary reference with actual Safaricom M-Pesa transaction code
-        }
-      });
+      // Update the transaction status and map actual Mpesa transaction code
+      await conn.execute(
+        'UPDATE transactions SET status = ?, reference = ? WHERE id = ?',
+        [finalStatus, referenceCode, transaction.id]
+      );
 
-      // Send a system-wide user notification alert about the deposit status
-      await tx.notification.create({
-        data: {
-          profileId: transaction.profileId,
-          title: payload.status === 'SUCCESS' ? 'Deposit Completed' : 'Deposit Failed',
-          message: payload.status === 'SUCCESS' 
+      // Create an in-app player notification
+      await conn.execute(
+        `INSERT INTO notifications (id, profile_id, title, message, \`read\`) 
+         VALUES (?, ?, ?, ?, 0)`,
+        [
+          crypto.randomUUID(),
+          transaction.profile_id,
+          payload.status === 'SUCCESS' ? 'Deposit Completed' : 'Deposit Failed',
+          payload.status === 'SUCCESS' 
             ? `Your deposit of ${transaction.currency} ${transaction.amount} has been approved.` 
-            : `Your deposit of ${transaction.currency} ${transaction.amount} was not processed.`,
-          read: false
-        }
-      });
-    });
+            : `Your deposit of ${transaction.currency} ${transaction.amount} was not processed.`
+        ]
+      );
 
-    return true;
+      await conn.commit();
+      return true;
+    } catch (error) {
+      await conn.rollback();
+      throw error;
+    } finally {
+      conn.release();
+    }
   }
 
   // Initiates a withdrawal transaction after checking if the user has a sufficient balance
@@ -161,19 +183,19 @@ export class WalletService {
     const currentBalance = await this.getBalance(profileId);
     if (currentBalance < amount) throw new Error('Insufficient balance');
 
-    const profile = await db.profile.findUnique({ where: { id: profileId } });
-    if (!profile) throw new Error('User profile not found');
+    const [profiles] = await db.execute<RowDataPacket[]>(
+      'SELECT currency FROM profiles WHERE id = ? LIMIT 1',
+      [profileId]
+    );
+    if (profiles.length === 0) throw new Error('User profile not found');
+    const profile = profiles[0];
 
-    await db.transaction.create({
-      data: {
-        profileId,
-        type: 'WITHDRAWAL',
-        amount,
-        currency: profile.currency || 'USD',
-        status: 'PENDING',
-        reference
-      }
-    });
+    const id = crypto.randomUUID();
+    await db.execute(
+      `INSERT INTO transactions (id, profile_id, type, amount, currency, status, reference) 
+       VALUES (?, ?, 'WITHDRAWAL', ?, ?, 'PENDING', ?)`,
+      [id, profileId, amount, profile.currency || 'USD', reference]
+    );
 
     return true;
   }

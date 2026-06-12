@@ -4,15 +4,14 @@ import { JWT_SECRET as ENV_JWT_SECRET } from '$env/static/private';
 import { db } from '../db';
 import type { registerSchema, loginSchema } from '$lib/utils/validation';
 import type { z } from 'zod';
+import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 
-// HMAC key initialization using SvelteKit static private environment variable
 const JWT_SECRET = new TextEncoder().encode(ENV_JWT_SECRET || 'fallback-secure-secret-key-at-least-256-bits-long');
 
 type RegisterInput = z.infer<typeof registerSchema>;
 type LoginInput = z.infer<typeof loginSchema>;
 
 export class AuthService {
-  // Signs a secure HS256 stateless session JWT
   static async generateSessionToken(user: { id: string; email: string; role: string }): Promise<string> {
     return await new SignJWT({ userId: user.id, email: user.email, role: user.role })
       .setProtectedHeader({ alg: 'HS256' })
@@ -21,7 +20,6 @@ export class AuthService {
       .sign(JWT_SECRET);
   }
 
-  // Verifies the payload signature of an active session token
   static async verifySessionToken(token: string): Promise<{ userId: string; email: string; role: string } | null> {
     try {
       const { payload } = await jwtVerify(token, JWT_SECRET);
@@ -35,75 +33,94 @@ export class AuthService {
     }
   }
 
-  // Registers a new user and profile inside an atomic database transaction
+  // Registers a new user and profile inside an atomic SQL transaction pool
   static async register(data: RegisterInput): Promise<string> {
     const passwordHash = await bcrypt.hash(data.password, 10);
+    const userId = crypto.randomUUID();
 
-    return await db.$transaction(async (tx) => {
-      const existingUser = await tx.user.findUnique({ where: { email: data.email } });
-      if (existingUser) throw new Error('Email is already registered');
+    const conn = await db.getConnection();
 
-      const existingProfile = await tx.profile.findUnique({ where: { username: data.username } });
-      if (existingProfile) throw new Error('Username is already taken');
+    try {
+      await conn.beginTransaction();
 
-      // Check if a referral code was provided and match it to a referrer profile
+      // Check email uniqueness
+      const [existingUsers] = await conn.execute<RowDataPacket[]>(
+        'SELECT id FROM users WHERE email = ? LIMIT 1',
+        [data.email]
+      );
+      if (existingUsers.length > 0) throw new Error('Email is already registered');
+
+      // Check username uniqueness
+      const [existingProfiles] = await conn.execute<RowDataPacket[]>(
+        'SELECT id FROM profiles WHERE username = ? LIMIT 1',
+        [data.username]
+      );
+      if (existingProfiles.length > 0) throw new Error('Username is already taken');
+
+      // Check referrer code
       let referredBy: string | null = null;
       if (data.referralCode) {
-        const referrer = await tx.profile.findUnique({ where: { referralCode: data.referralCode } });
-        if (referrer) {
-          referredBy = referrer.id;
-        }
+        const [referrer] = await conn.execute<RowDataPacket[]>(
+          'SELECT id FROM profiles WHERE referral_code = ? LIMIT 1',
+          [data.referralCode]
+        );
+        if (referrer.length > 0) referredBy = referrer[0].id;
       }
 
-      // Generate a highly random and unique referral code for the new profile
+      // Generate unique referral code
       let referralCode = '';
       let isUnique = false;
       while (!isUnique) {
         referralCode = 'CHAMP-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-        const codeCheck = await tx.profile.findUnique({ where: { referralCode } });
-        if (!codeCheck) isUnique = true;
+        const [codeCheck] = await conn.execute<RowDataPacket[]>(
+          'SELECT id FROM profiles WHERE referral_code = ? LIMIT 1',
+          [referralCode]
+        );
+        if (codeCheck.length === 0) isUnique = true;
       }
 
-      // Retrieve the base VIP tier with the lowest points threshold
-      const baseVip = await tx.vipTier.findFirst({
-        orderBy: { minPoints: 'asc' }
-      });
+      // Find default VIP tier
+      const [vipTiers] = await conn.execute<RowDataPacket[]>(
+        'SELECT id FROM vip_tiers ORDER BY min_points ASC LIMIT 1'
+      );
+      const baseVipId = vipTiers.length > 0 ? vipTiers[0].id : null;
 
-      const user = await tx.user.create({
-        data: {
-          email: data.email,
-          passwordHash,
-          role: 'PLAYER'
-        }
-      });
+      // Insert User record
+      await conn.execute(
+        'INSERT INTO users (id, email, password_hash, role) VALUES (?, ?, ?, ?)',
+        [userId, data.email, passwordHash, 'PLAYER']
+      );
 
-      await tx.profile.create({
-        data: {
-          id: user.id,
-          email: data.email,
-          username: data.username,
-          fullName: data.fullName,
-          phone: data.phone,
-          country: data.country,
-          currency: data.currency,
-          referralCode,
-          referredBy,
-          vipTierId: baseVip ? baseVip.id : null
-        }
-      });
+      // Insert Profile record
+      await conn.execute(
+        'INSERT INTO profiles (id, email, username, full_name, phone, country, currency, referral_code, referred_by, vip_tier_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [userId, data.email, data.username, data.fullName, data.phone, data.country, data.currency, referralCode, referredBy, baseVipId]
+      );
 
-      return await this.generateSessionToken(user);
-    });
+      await conn.commit();
+
+      return await this.generateSessionToken({ id: userId, email: data.email, role: 'PLAYER' });
+    } catch (error) {
+      await conn.rollback();
+      throw error;
+    } finally {
+      conn.release();
+    }
   }
 
-  // Verifies email credentials and outputs a session token upon matching password hash
+  // Verifies login credentials using standard SQL queries
   static async login(data: LoginInput): Promise<string> {
-    const user = await db.user.findUnique({ where: { email: data.email } });
-    if (!user) throw new Error('Invalid email or password');
+    const [users] = await db.execute<RowDataPacket[]>(
+      'SELECT id, email, password_hash, role FROM users WHERE email = ? LIMIT 1',
+      [data.email]
+    );
 
-    const isMatch = await bcrypt.compare(data.password, user.passwordHash);
+    if (users.length === 0) throw new Error('Invalid email or password');
+    const user = users[0];
+
+    const isMatch = await bcrypt.compare(data.password, user.password_hash);
     if (!isMatch) throw new Error('Invalid email or password');
 
-    return await this.generateSessionToken(user);
+    return await this.generateSessionToken({ id: user.id, email: user.email, role: user.role });
   }
 }

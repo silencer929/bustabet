@@ -1,104 +1,119 @@
 import { db } from '../db';
 import { OddsApiService } from './oddsApi.service';
+import type { RowDataPacket } from 'mysql2';
 
 export class SettlementService {
-  // Pulls recent completed scores and resolves all pending wagers for a specific sport key
+  // Pulls completed scores and resolves all pending wagers dynamically
   static async settleSportBets(sportKey: string): Promise<void> {
     const scores = await OddsApiService.getScores(sportKey, 3);
+    const conn = await db.getConnection();
 
-    for (const match of scores) {
-      if (!match.completed || !match.scores) continue;
+    try {
+      for (const match of scores) {
+        if (!match.completed || !match.scores) continue;
 
-      // Find all pending local bets associated with this finalized fixture
-      const pendingBets = await db.bet.findMany({
-        where: { gameId: match.id, status: 'PENDING' },
-        include: { market: true, game: true }
-      });
+        // Retrieve all pending wagers registered to this completed fixture
+        const [pendingBets] = await conn.execute<RowDataPacket[]>(
+          `SELECT b.id, b.profile_id, b.stake, b.odds, b.potential_win,
+                  m.selection, m.market_name,
+                  g.home_team, g.away_team
+           FROM bets b
+           INNER JOIN admin_game_markets m ON b.market_id = m.id
+           INNER JOIN admin_games g ON b.game_id = g.id
+           WHERE b.game_id = ? AND b.status = 'PENDING'`,
+          [match.id]
+        );
 
-      if (pendingBets.length === 0) {
-        // Mark game as completed in database even if no bets exist
-        await db.adminGame.update({
-          where: { id: match.id },
-          data: { status: 'COMPLETED' }
-        });
-        continue;
-      }
+        if (pendingBets.length === 0) {
+          await conn.execute(
+            'UPDATE admin_games SET status = "COMPLETED" WHERE id = ?',
+            [match.id]
+          );
+          continue;
+        }
 
-      // Determine score metrics for home and away teams
-      const homeScoreObj = match.scores.find((s) => s.name === match.home_team);
-      const awayScoreObj = match.scores.find((s) => s.name === match.away_team);
+        const homeScoreObj = match.scores.find((s) => s.name === match.home_team);
+        const awayScoreObj = match.scores.find((s) => s.name === match.away_team);
 
-      if (!homeScoreObj || !awayScoreObj) continue;
+        if (!homeScoreObj || !awayScoreObj) continue;
 
-      const homeScore = parseInt(homeScoreObj.score, 10);
-      const awayScore = parseInt(awayScoreObj.score, 10);
+        const homeScore = parseInt(homeScoreObj.score, 10);
+        const awayScore = parseInt(awayScoreObj.score, 10);
 
-      // Determine the winner string for Head-to-Head (h2h) markets
-      let h2hWinningSelection = 'Draw';
-      if (homeScore > awayScore) {
-        h2hWinningSelection = match.home_team;
-      } else if (awayScore > homeScore) {
-        h2hWinningSelection = match.away_team;
-      }
+        let h2hWinner = 'Draw';
+        if (homeScore > awayScore) {
+          h2hWinner = match.home_team;
+        } else if (awayScore > homeScore) {
+          h2hWinner = match.away_team;
+        }
 
-      for (const bet of pendingBets) {
-        await db.$transaction(async (tx) => {
+        for (const bet of pendingBets) {
+          await conn.beginTransaction();
+
           let isWon = false;
-
-          // Resolve market outcomes based on specific market parameters
-          if (bet.market.marketName === 'h2h') {
-            isWon = bet.market.selection === h2hWinningSelection;
+          if (bet.market_name === 'h2h') {
+            isWon = bet.selection === h2hWinner;
           }
 
           if (isWon) {
-            await tx.bet.update({
-              where: { id: bet.id },
-              data: { status: 'WON' }
-            });
+            // Update bet as WON
+            await conn.execute(
+              'UPDATE bets SET status = "WON" WHERE id = ?',
+              [bet.id]
+            );
 
-            // Log a completed payout ledger to increment user balance
-            await tx.transaction.create({
-              data: {
-                profileId: bet.profileId,
-                type: 'PAYOUT',
-                amount: bet.potentialWin,
-                currency: 'USD',
-                status: 'COMPLETED',
-                reference: `PAY-${bet.id}`
-              }
-            });
+            // Log payout transaction
+            await conn.execute(
+              `INSERT INTO transactions (id, profile_id, type, amount, currency, status, reference) 
+               VALUES (?, ?, 'PAYOUT', ?, 'USD', 'COMPLETED', ?)`,
+              [crypto.randomUUID(), bet.profile_id, bet.potential_win, `PAY-${bet.id}`]
+            );
 
-            await tx.notification.create({
-              data: {
-                profileId: bet.profileId,
-                title: 'Bet Won!',
-                message: `Congratulations! Your bet on ${bet.game.homeTeam} vs ${bet.game.awayTeam} was won. Payout added.`,
-                read: false
-              }
-            });
+            // Alert player
+            await conn.execute(
+              `INSERT INTO notifications (id, profile_id, title, message, \`read\`) 
+               VALUES (?, ?, ?, ?, 0)`,
+              [
+                crypto.randomUUID(),
+                bet.profile_id,
+                'Bet Won!',
+                `Congratulations! Your bet on ${bet.home_team} vs ${bet.away_team} was won. Payout processed.`
+              ]
+            );
           } else {
-            await tx.bet.update({
-              where: { id: bet.id },
-              data: { status: 'LOST' }
-            });
+            // Update bet as LOST
+            await conn.execute(
+              'UPDATE bets SET status = "LOST" WHERE id = ?',
+              [bet.id]
+            );
 
-            await tx.notification.create({
-              data: {
-                profileId: bet.profileId,
-                title: 'Bet Settled',
-                message: `Your bet on ${bet.game.homeTeam} vs ${bet.game.awayTeam} was settled as lost.`,
-                read: false
-              }
-            });
+            // Alert player
+            await conn.execute(
+              `INSERT INTO notifications (id, profile_id, title, message, \`read\`) 
+               VALUES (?, ?, ?, ?, 0)`,
+              [
+                crypto.randomUUID(),
+                bet.profile_id,
+                'Bet Settled',
+                `Your bet on ${bet.home_team} vs ${bet.away_team} was settled as lost.`
+              ]
+            );
           }
-        });
-      }
 
-      // Mark the local fixture as completed
-      await db.adminGame.update({
-        where: { id: match.id },
-        data: { status: 'COMPLETED' }
-      });
+          await conn.commit();
+        }
+
+        // Close out match fixture
+        await conn.execute(
+          'UPDATE admin_games SET status = "COMPLETED" WHERE id = ?',
+          [match.id]
+        );
+      }
+    } catch (error) {
+      await conn.rollback();
+      throw error;
+    } finally {
+      conn.release();
     }
   }
 }

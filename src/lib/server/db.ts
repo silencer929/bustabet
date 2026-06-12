@@ -1,15 +1,10 @@
-import { PrismaClient } from '@prisma/client';
-import { dev } from '$app/environment';
+import mysql from 'mysql2/promise';
+import { DATABASE_URL } from '$env/static/private';
 
-// Cache database client globally during hot-reloads in development
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
-};
-
-export const db = globalForPrisma.prisma ?? new PrismaClient({
-  log: dev ? ['query', 'error', 'warn'] : ['error']
+// Initialize a robust, high-performance connection pool
+export const db = mysql.createPool({
+  uri: DATABASE_URL,
+  connectionLimit: 15,          // Prevents connection starvation
+  enableKeepAlive: true,        // Prevents MySQL timeouts on idle
+  keepAliveInitialDelay: 10000
 });
-
-if (dev) {
-  globalForPrisma.prisma = db;
-}
