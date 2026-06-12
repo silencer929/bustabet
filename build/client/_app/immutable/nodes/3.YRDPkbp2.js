@@ -1,0 +1,1 @@
+import{I as e,P as t,gt as n}from"../chunks/ByXn1zri.js";import"../chunks/xihTtKlq.js";var r=e(`<h1>Welcome to SvelteKit</h1> <p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>`,1);function i(e){var i=r();n(2),t(e,i)}export{i as component};

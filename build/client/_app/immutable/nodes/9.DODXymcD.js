@@ -1,0 +1,1 @@
+import{I as e,P as t,gt as n}from"../chunks/ByXn1zri.js";import"../chunks/xihTtKlq.js";var r=e(`<h1>Promotions Management</h1> <div class="promotions-table"></div>`,1);function i(e){var i=r();n(2),t(e,i)}export{i as component};

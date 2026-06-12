@@ -31,7 +31,7 @@
 
 <aside class="fixed top-16 bottom-0 left-0 z-30 hidden w-64 border-r border-border/80 bg-background px-4 py-6 lg:block">
   <div class="mb-4 px-3 text-[10px] font-black tracking-widest text-neutral-500 uppercase">Sports</div>
-  <nav class="space-y-1 overflow-y-auto max-h-[calc(100vh-10rem)]">
+  <nav class="space-y-1 overflow-y-auto max-h-[calc(100vh-10rem)] custom-scrollbar">
     {#each sportsList as sport}
       <a 
         href={sport.path} 

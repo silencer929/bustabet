@@ -97,7 +97,7 @@
   </div>
 
   <!-- Selection List -->
-  <div class="flex-1 overflow-y-auto p-4 space-y-3">
+  <div class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
     {#if betslip.count === 0}
       <div class="flex h-full flex-col items-center justify-center text-center py-12">
         <div class="rounded-full bg-background p-4 mb-3 border border-border">

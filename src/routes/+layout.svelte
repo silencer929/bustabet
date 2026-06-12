@@ -3,18 +3,18 @@
   import { page } from '$app/stores'; // Import SvelteKit page store to read current route
   import { auth } from '$lib/stores/auth.svelte';
   import { wallet } from '$lib/stores/wallet.svelte';
+  import { notificationsStore } from '$lib/stores/notifications.svelte';
   import Header from '$lib/components/layout/Header.svelte';
   import Sidebar from '$lib/components/layout/Sidebar.svelte';
   import MenuDrawer from '$lib/components/layout/MenuDrawer.svelte';
   import MobileNav from '$lib/components/layout/MobileNav.svelte';
   import Footer from '$lib/components/layout/Footer.svelte';
-  import SportsScroll from '$lib/components/sportsbook/SportsScroll.svelte';
   import BetSlip from '$lib/components/sportsbook/BetSlip.svelte';
   import Preloader from '$lib/components/ui/Preloader.svelte';
   import { Toaster } from 'svelte-sonner';
 
   let { data, children } = $props<{
-    data: { user: any; balance: number };
+    data: { user: any; balance: number; notifications: any[] };
     children: import('svelte').Snippet;
   }>();
 
@@ -25,16 +25,17 @@
 
   // Derived state to check if the user is currently browsing any admin route
   const isAdminRoute = $derived($page.url.pathname.startsWith('/admin'));
-
+  // Synchronize server-loaded data with Svelte 5 client-side runes stores
   $effect(() => {
     auth.setUser(data.user);
     if (data.user) {
       wallet.setWallet(data.balance, data.user.currency || 'USD');
+      notificationsStore.setList(data.notifications || []); // Sync notifications array
     } else {
       wallet.reset();
+      notificationsStore.reset();
     }
   });
-
   $effect(() => {
     setTimeout(() => {
       isLoading = false;
@@ -42,18 +43,13 @@
   });
 </script>
 
-<Toaster theme={theme} position="top-right" richColors />
+<Toaster theme="light" position="top-right" richColors />
 
 <Preloader active={isLoading} />
 
 <div class="min-h-screen bg-background text-foreground flex flex-col font-sans">
   <!-- Top Navigation Header (Render globally across both admin and player routes) -->
   <Header onMenuToggle={() => isMenuOpen = !isMenuOpen} />
-
-  <!-- Conditionally render Sports Sub-header (Exclude on Admin routes) -->
-  {#if !isAdminRoute}
-    <SportsScroll />
-  {/if}
 
   <div class="flex flex-1 relative overflow-hidden">
     <!-- Conditionally render Left Sports Sidebar (Exclude on Admin routes) -->

@@ -141,3 +141,37 @@
 		@apply font-sans scroll-smooth;
 	}
 }
+
+/* Custom Premium Scrollbar Utility */
+.custom-scrollbar {
+  scroll-behavior: smooth;
+  scrollbar-width: thin; /* Firefox support */
+  scrollbar-color: oklch(1 0 0 / 15%) transparent; /* Firefox support */
+}
+
+/* Width of vertical scrollbar & height of horizontal scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px; /* Narrow width */
+  height: 4px;
+}
+
+/* Styles the background track container */
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent; /* Seamless blend */
+}
+
+/* Styles the draggable scroll handle indicator */
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: oklch(1 0 0 / 15%); /* Subtle translucent gray */
+  border-radius: 9999px;
+}
+
+/* Transitions the handle to gold on user hover */
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--primary); /* Swaps to gold */
+}
+
+/* Completely removes the top and bottom default scrollbar arrow buttons */
+.custom-scrollbar::-webkit-scrollbar-button {
+  display: none;
+}
