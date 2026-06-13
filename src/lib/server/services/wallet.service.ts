@@ -1,10 +1,5 @@
 import { db } from '../db';
-import { 
-  PAYHERO_API_USERNAME, 
-  PAYHERO_API_PASSWORD, 
-  PAYHERO_CHANNEL_ID, 
-  PAYHERO_CALLBACK_URL 
-} from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import type { RowDataPacket } from 'mysql2';
 
 export class WalletService {
@@ -71,7 +66,7 @@ export class WalletService {
         [transactionId, profileId, amount, profile.currency || 'KES', reference]
       );
 
-      const authHeader = 'Basic ' + Buffer.from(`${PAYHERO_API_USERNAME}:${PAYHERO_API_PASSWORD}`).toString('base64');
+      const authHeader = 'Basic ' + Buffer.from(`${env.PAYHERO_API_USERNAME}:${env.PAYHERO_API_PASSWORD}`).toString('base64');
 
       const response = await fetch('https://backend.payhero.co.ke/api/v2/payments', {
         method: 'POST',
@@ -82,10 +77,10 @@ export class WalletService {
         body: JSON.stringify({
           amount: Math.round(amount),
           phone_number: phoneNumber,
-          channel_id: Number(PAYHERO_CHANNEL_ID),
+          channel_id: Number(env.PAYHERO_CHANNEL_ID),
           provider: 'm-pesa',
           external_reference: reference,
-          callback_url: PAYHERO_CALLBACK_URL,
+          callback_url: env.PAYHERO_CALLBACK_URL,
           customer_name: profile.full_name || profile.username
         })
       });

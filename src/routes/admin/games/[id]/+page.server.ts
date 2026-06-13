@@ -1,6 +1,7 @@
 import { fail, redirect, error } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
+import type { RowDataPacket } from 'mysql2';
 import type { GameWithMarkets } from '$lib/types/game';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
@@ -8,21 +9,26 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     throw redirect(303, '/sportsbook');
   }
 
-  const gameRaw = await db.adminGame.findUnique({
-    where: { id: params.id },
-    include: { markets: true }
-  });
+  const [gamesRaw] = await db.execute<RowDataPacket[]>(
+    'SELECT g.*, m.id AS marketId, m.marketName, m.selection, m.odds, m.active FROM games g LEFT JOIN adminGameMarkets m ON g.id = m.gameId WHERE g.id = ?',
+    [params.id]
+  );
 
-  if (!gameRaw) {
+  if (!gamesRaw.length) {
     throw error(404, 'Fixture not found');
   }
 
   const serializedGame: GameWithMarkets = {
-    ...gameRaw,
-    markets: gameRaw.markets.map((market) => ({
-      ...market,
-      odds: Number(market.odds) as any
-    }))
+    ...gamesRaw[0],
+    markets: gamesRaw
+      .filter((row) => row.marketId)
+      .map((row) => ({
+        id: row.marketId,
+        marketName: row.marketName,
+        selection: row.selection,
+        odds: Number(row.odds),
+        active: Boolean(row.active)
+      }))
   };
 
   return { game: serializedGame };
@@ -42,15 +48,10 @@ export const actions: Actions = {
     }
 
     try {
-      await db.adminGameMarket.create({
-        data: {
-          gameId: params.id,
-          marketName,
-          selection,
-          odds,
-          active: true
-        }
-      });
+      await db.execute(
+        'INSERT INTO adminGameMarkets (id, gameId, marketName, selection, odds, active) VALUES (?, ?, ?, ?, ?, 1)',
+        [crypto.randomUUID(), params.id, marketName, selection, odds]
+      );
       return { success: true };
     } catch {
       return fail(500, { error: 'Failed to create market option' });
@@ -69,10 +70,10 @@ export const actions: Actions = {
     }
 
     try {
-      await db.adminGameMarket.update({
-        where: { id: marketId },
-        data: { odds }
-      });
+      await db.execute(
+        'UPDATE adminGameMarkets SET odds = ? WHERE id = ?',
+        [odds, marketId]
+      );
       return { success: true };
     } catch {
       return fail(500, { error: 'Failed to update odds value' });
@@ -86,10 +87,10 @@ export const actions: Actions = {
     const activeStr = formData.get('active') as string;
 
     try {
-      await db.adminGameMarket.update({
-        where: { id: marketId },
-        data: { active: activeStr === 'true' }
-      });
+      await db.execute(
+        'UPDATE adminGameMarkets SET active = ? WHERE id = ?',
+        [activeStr === 'true', marketId]
+      );
       return { success: true };
     } catch {
       return fail(500, { error: 'Failed to toggle status' });
@@ -102,9 +103,10 @@ export const actions: Actions = {
     const marketId = formData.get('marketId') as string;
 
     try {
-      await db.adminGameMarket.delete({
-        where: { id: marketId }
-      });
+      await db.execute(
+        'DELETE FROM adminGameMarkets WHERE id = ?',
+        [marketId]
+      );
       return { success: true };
     } catch {
       return fail(500, { error: 'Failed to delete market option' });

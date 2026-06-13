@@ -1,21 +1,16 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
+import type { RowDataPacket } from 'mysql2';
 
 export const load: PageServerLoad = async ({ locals }) => {
   // Double-verify admin roles before loading wager tables
   if (!locals.user || locals.user.user.role !== 'ADMIN') {
     throw redirect(303, '/sportsbook');
   }
-
-  const betsRaw = await db.bet.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: {
-      profile: { select: { username: true } },
-      game: true,
-      market: true
-    }
-  });
+  const [betsRaw] = await db.execute<RowDataPacket[]>(
+    'SELECT b.*, g.homeTeam, g.awayTeam FROM bet b LEFT JOIN games g ON b.gameId = g.id ORDER BY b.createdAt DESC'
+  );
 
   // Convert custom decimal properties to serializable numbers
   const serializedBets = betsRaw.map((bet) => ({

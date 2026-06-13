@@ -1,6 +1,7 @@
 import { fail, redirect, error } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
+import type { RowDataPacket } from 'mysql2';
 import { WalletService } from '$lib/server/services/wallet.service';
 import bcrypt from 'bcryptjs';
 
@@ -9,32 +10,30 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     throw redirect(303, '/sportsbook');
   }
 
-  const profile = await db.profile.findUnique({
-    where: { id: params.id },
-    include: {
-      user: { select: { id: true, email: true, role: true } },
-      vipTier: true
-    }
-  });
-
+  const [profiles] = await db.execute<RowDataPacket[]>(
+    'SELECT p.*, u.email, u.role, vt.name AS vipTierName FROM profiles p JOIN users u ON p.userId = u.id LEFT JOIN vipTiers vt ON p.vipTierId = vt.id WHERE p.id = ?',
+    [params.id]
+  );
+  const profile = profiles[0] as (RowDataPacket & { email: string; role: string; vipTierName: string | null }) | undefined;
   if (!profile) throw error(404, 'User profile not found');
 
   const balance = await WalletService.getBalance(params.id);
 
   // Load user's transaction history
-  const transactionsRaw = await db.transaction.findMany({
-    where: { profileId: params.id },
-    orderBy: { createdAt: 'desc' }
-  });
+  const [transactionsRaw] = await db.execute<RowDataPacket[]>(
+    'SELECT * FROM transactions WHERE profileId = ? ORDER BY createdAt DESC',
+    [params.id]
+  );
 
   // Load user's wager history
-  const betsRaw = await db.bet.findMany({
-    where: { profileId: params.id },
-    orderBy: { createdAt: 'desc' },
-    include: { game: true, market: true }
-  });
+  const [betsRaw] = await db.execute<RowDataPacket[]>(
+    'SELECT * FROM bets WHERE profileId = ? ORDER BY createdAt DESC',
+    [params.id]
+  );
 
-  const vipTiers = await db.vipTier.findMany({ orderBy: { minPoints: 'asc' } });
+  const [vipTiers] = await db.execute<RowDataPacket[]>(
+    'SELECT id, name, minPoints FROM vipTiers ORDER BY minPoints ASC'
+  );
 
   // Serialize custom database Decimal values
   return {
@@ -54,16 +53,10 @@ export const actions: Actions = {
     const vipTierId = formData.get('vipTierId') as string;
 
     try {
-      await db.$transaction([
-        db.user.update({
-          where: { id: params.id },
-          data: { role }
-        }),
-        db.profile.update({
-          where: { id: params.id },
-          data: { vipTierId }
-        })
-      ]);
+      await db.execute(
+        'UPDATE users u JOIN profiles p ON u.id = p.userId SET u.role = ?, p.vipTierId = ? WHERE p.id = ?',
+        [role, vipTierId || null, params.id]
+      );
 
       return { success: true, message: 'Account status updated successfully' };
     } catch {
@@ -82,10 +75,10 @@ export const actions: Actions = {
 
     try {
       const passwordHash = await bcrypt.hash(newPassword, 10);
-      await db.user.update({
-        where: { id: params.id },
-        data: { passwordHash }
-      });
+      await db.execute(
+        'UPDATE users SET password_hash = ? WHERE id = ?',
+        [passwordHash, params.id]
+      );
 
       return { success: true, message: 'Password reset successfully!' };
     } catch {
@@ -105,16 +98,10 @@ export const actions: Actions = {
     }
 
     try {
-      await db.transaction.create({
-        data: {
-          profileId: params.id,
-          type,
-          amount,
-          currency: 'USD',
-          status: 'COMPLETED',
-          reference: `ADJ-${Math.random().toString(36).substring(2, 10).toUpperCase()}`
-        }
-      });
+      await db.execute(
+        'INSERT INTO transactions (profileId, type, amount, currency, status, reference) VALUES (?, ?, ?, ?, ?, ?)',
+        [params.id, type, amount, 'USD', 'COMPLETED', `ADJ-${Math.random().toString(36).substring(2, 10).toUpperCase()}`]
+      );
 
       return { success: true, message: 'Balance adjustment processed successfully!' };
     } catch {

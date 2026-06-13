@@ -1,6 +1,7 @@
 import { redirect, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
+import type { RowDataPacket } from 'mysql2';
 
 export const load: PageServerLoad = async ({ locals }) => {
   // Guard the route; redirect unauthenticated users to login
@@ -26,10 +27,10 @@ export const actions: Actions = {
     }
 
     try {
-      await db.profile.update({
-        where: { id: locals.user.id },
-        data: { fullName, phone }
-      });
+      await db.execute(
+        'UPDATE profiles SET fullName = ?, phone = ? WHERE id = ?',
+        [fullName.trim(), phone.trim(), locals.user.id]
+      );
 
       return { success: true, message: 'Profile details updated successfully!' };
     } catch (error: any) {

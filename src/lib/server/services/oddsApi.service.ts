@@ -1,4 +1,4 @@
-import { ODDS_API_KEY } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import type { Sport, OddsResponse, ScoreResponse } from '$lib/types/oddsApi';
 
 export class OddsApiService {
@@ -7,7 +7,7 @@ export class OddsApiService {
   // Helper method to execute and parse requests while tracking the remaining API credit quota
   private static async executeFetch<T>(endpoint: string): Promise<T> {
     const separator = endpoint.includes('?') ? '&' : '?';
-    const response = await fetch(`${this.baseUrl}${endpoint}${separator}apiKey=${ODDS_API_KEY}`);
+    const response = await fetch(`${this.baseUrl}${endpoint}${separator}apiKey=${env.ODDS_API_KEY}`);
 
     if (!response.ok) {
       const errorText = await response.text();

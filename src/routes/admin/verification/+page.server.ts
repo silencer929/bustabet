@@ -1,21 +1,16 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
+import type { RowDataPacket } from 'mysql2';
 
 export const load: PageServerLoad = async ({ locals }) => {
   // Double-verify admin roles before loading compliance tables
   if (!locals.user || locals.user.user.role !== 'ADMIN') {
     throw redirect(303, '/sportsbook');
   }
-
-  const documents = await db.verificationDoc.findMany({
-    orderBy: { submittedAt: 'desc' },
-    include: {
-      profile: {
-        select: { username: true }
-      }
-    }
-  });
+  const [documents] = await db.execute<RowDataPacket[]>(
+    'SELECT d.*, p.username FROM verification_documents d LEFT JOIN profiles p ON d.profileId = p.id ORDER BY d.submittedAt DESC'
+  ); 
 
   return { documents };
 };
@@ -29,23 +24,10 @@ export const actions: Actions = {
     const id = formData.get('id') as string;
 
     try {
-      const doc = await db.verificationDoc.update({
-        where: { id },
-        data: {
-          status: 'APPROVED',
-          reviewedBy: locals.user.id
-        }
-      });
-
-      // Dispatch congratulatory account limits notification to player
-      await db.notification.create({
-        data: {
-          profileId: doc.profileId,
-          title: 'KYC Verification Approved',
-          message: `Your ${doc.documentType.replace('_', ' ')} has been approved. Your account limits have been successfully removed.`,
-          read: false
-        }
-      });
+      await db.execute(
+        'UPDATE verification_documents SET status = ?, reviewedBy = ? WHERE id = ?',
+        ['APPROVED', locals.user.id, id]
+      );
 
       return { success: true };
     } catch {
@@ -61,23 +43,10 @@ export const actions: Actions = {
     const id = formData.get('id') as string;
 
     try {
-      const doc = await db.verificationDoc.update({
-        where: { id },
-        data: {
-          status: 'REJECTED',
-          reviewedBy: locals.user.id
-        }
-      });
-
-      // Dispatch a corrective notice alerting the player to re-upload documents
-      await db.notification.create({
-        data: {
-          profileId: doc.profileId,
-          title: 'KYC Verification Rejected',
-          message: `Your ${doc.documentType.replace('_', ' ')} was rejected. Please re-upload a clear, uncropped copy.`,
-          read: false
-        }
-      });
+      await db.execute(
+        'UPDATE verification_documents SET status = ?, reviewedBy = ? WHERE id = ?',
+        ['REJECTED', locals.user.id, id]
+      );
 
       return { success: true };
     } catch {

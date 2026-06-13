@@ -4,9 +4,9 @@ import { db } from '$lib/server/db';
 import type { RowDataPacket } from 'mysql2';
 import bcrypt from 'bcryptjs';
 import { jwtVerify } from 'jose';
-import { JWT_SECRET as ENV_JWT_SECRET } from '$env/static/private';
+import { env} from '$env/dynamic/private';
 
-const JWT_SECRET = new TextEncoder().encode(ENV_JWT_SECRET || 'fallback-secure-secret-key-at-least-256-bits-long');
+const JWT_SECRET = new TextEncoder().encode(env.JWT_SECRET || 'fallback-secure-secret-key-at-least-256-bits-long');
 
 export const load: PageServerLoad = async ({ url }) => {
   const token = url.searchParams.get('token');

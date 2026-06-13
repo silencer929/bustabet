@@ -3,10 +3,10 @@ import type { Actions } from './$types';
 import { db } from '$lib/server/db';
 import { NotificationService } from '$lib/server/services/notification.service';
 import { SignJWT } from 'jose';
-import { JWT_SECRET as ENV_JWT_SECRET } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import type { RowDataPacket } from 'mysql2';
 
-const JWT_SECRET = new TextEncoder().encode(ENV_JWT_SECRET || 'fallback-secure-secret-key-at-least-256-bits-long');
+const JWT_SECRET = new TextEncoder().encode(env.JWT_SECRET || 'fallback-secure-secret-key-at-least-256-bits-long');
 
 export const actions: Actions = {
   default: async ({ request }) => {

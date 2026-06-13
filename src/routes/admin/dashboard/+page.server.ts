@@ -1,42 +1,59 @@
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
+import type { RowDataPacket } from 'mysql2';
 
 export const load: PageServerLoad = async () => {
-  const totalUsers = await db.user.count();
+  const [usersRaw] = await db.execute<RowDataPacket[]>(
+    'SELECT COUNT(*) AS totalUsers FROM users'
+  );
+  const totalUsers = usersRaw[0].totalUsers as number; 
 
-  const pendingBetsCount = await db.bet.count({
-    where: { status: 'PENDING' }
-  });
+  // const pendingBetsCount = await db.bet.count({
+  //   where: { status: 'PENDING' }
+  // });
+  const [pendingBetsRaw] = await db.execute<RowDataPacket[]>(
+    'SELECT COUNT(*) AS pendingBetsCount FROM bets WHERE status = ?',
+    ['PENDING']
+  );
+  const pendingBetsCount = pendingBetsRaw[0].pendingBetsCount as number;  
 
-  const pendingBetsTurnover = await db.bet.aggregate({
-    where: { status: 'PENDING' },
-    _sum: { stake: true }
-  });
+  const [pendingBetsTurnoverRaw] = await db.execute<RowDataPacket[]>(
+    'SELECT SUM(stake) AS pendingBetsTurnover FROM bets WHERE status = ?',
+    ['PENDING']
+  );
+  const pendingBetsTurnover = pendingBetsTurnoverRaw[0].pendingBetsTurnover as number || 0;
 
-  const pendingWithdrawalsAmount = await db.transaction.aggregate({
-    where: { type: 'WITHDRAWAL', status: 'PENDING' },
-    _sum: { amount: true }
-  });
-
-  const openTicketsCount = await db.supportConversation.count({
-    where: { status: 'OPEN' }
-  });
+  const [pendingWithdrawalsRaw] = await db.execute<RowDataPacket[]>(
+    'SELECT SUM(amount) AS pendingWithdrawalsAmount FROM transactions WHERE type = ? AND status = ?',
+    ['WITHDRAWAL', 'PENDING']
+  );
+  const pendingWithdrawalsAmount = pendingWithdrawalsRaw[0].pendingWithdrawalsAmount as number || 0;
+  
+  // Query the total count of open support tickets
+  const [openTicketsRaw] = await db.execute<RowDataPacket[]>(
+    'SELECT COUNT(*) AS openTicketsCount FROM supportConversations WHERE status = ?',
+    ['OPEN']
+  );
+  const openTicketsCount = openTicketsRaw[0].openTicketsCount as number;
 
   // Query the total count of pending KYC identity documents awaiting audit
-  const pendingKycCount = await db.verificationDoc.count({
-    where: { status: 'PENDING' }
-  });
+  const [pendingKycRaw] = await db.execute<RowDataPacket[]>(
+    'SELECT COUNT(*) AS pendingKycCount FROM verificationDocs WHERE status = ?',
+    ['PENDING']
+  );
+  const pendingKycCount = pendingKycRaw[0].pendingKycCount as number;
 
-  // Aggregate settled bets metrics to calculate GGR (Turnover - Payouts)
-  const settledStakes = await db.bet.aggregate({
-    where: { status: { in: ['WON', 'LOST'] } },
-    _sum: { stake: true }
-  });
+  const [settledStakesRaw] = await db.execute<RowDataPacket[]>(
+    'SELECT SUM(stake) AS totalTurnover FROM bets WHERE status IN (?, ?)',
+    ['WON', 'LOST']
+  );
+  const settledStakes = { _sum: { stake: settledStakesRaw[0].totalTurnover as number || 0 } };
 
-  const settledPayouts = await db.bet.aggregate({
-    where: { status: 'WON' },
-    _sum: { potentialWin: true }
-  });
+  const [settledPayoutsRaw] = await db.execute<RowDataPacket[]>(
+    'SELECT SUM(potentialWin) AS totalPayouts FROM bets WHERE status = ?',
+    ['WON']
+  );
+  const settledPayouts = { _sum: { potentialWin: settledPayoutsRaw[0].totalPayouts as number || 0 } };
 
   const totalTurnover = Number(settledStakes._sum.stake || 0);
   const totalPayouts = Number(settledPayouts._sum.potentialWin || 0);
@@ -46,8 +63,8 @@ export const load: PageServerLoad = async () => {
     stats: {
       totalUsers,
       pendingBetsCount,
-      pendingBetsTurnover: Number(pendingBetsTurnover._sum.stake || 0),
-      pendingWithdrawalsAmount: Number(pendingWithdrawalsAmount._sum.amount || 0),
+      pendingBetsTurnover: Number(pendingBetsTurnover || 0),
+      pendingWithdrawalsAmount: Number(pendingWithdrawalsAmount || 0),
       openTicketsCount,
       pendingKycCount,
       totalTurnover,

@@ -1,12 +1,12 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { OddsSyncService } from '$lib/server/services/oddsSync.service';
-import { CRON_SECRET } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 export const GET: RequestHandler = async ({ url }) => {
   const incomingSecret = url.searchParams.get('secret');
 
-  if (incomingSecret !== CRON_SECRET) {
+  if (incomingSecret !== env.CRON_SECRET) {
     return json({ success: false, message: 'Unauthorized access' }, { status: 401 });
   }
 
