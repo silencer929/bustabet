@@ -1,6 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
+import type { RowDataPacket } from 'mysql2';
 
 export const load: PageServerLoad = async ({ locals }) => {
   // Guard the route; redirect unauthenticated users to login
@@ -8,32 +9,37 @@ export const load: PageServerLoad = async ({ locals }) => {
     throw redirect(303, '/auth/login');
   }
 
-  const profile = await db.profile.findUnique({
-    where: { id: locals.user.id },
-    include: { vipTier: true }
-  });
+  // Retrieve player profile and active VIP benefits using a left SQL join
+  const [profiles] = await db.execute<RowDataPacket[]>(
+    `SELECT p.id, p.email, p.username, p.full_name as fullName, p.phone, p.country, p.currency, p.referral_code as referralCode, p.referred_by as referredBy, p.vip_tier_id as vipTierId, p.created_at as createdAt,
+            v.name as vipTierName, v.min_points as vipTierMinPoints, v.cashback_percent as vipTierCashback, v.bonus_percent as vipTierBonus
+     FROM profiles p
+     LEFT JOIN vip_tiers v ON p.vip_tier_id = v.id
+     WHERE p.id = ? LIMIT 1`,
+    [locals.user.id]
+  );
 
-  if (!profile) throw redirect(303, '/auth/login');
+  if (profiles.length === 0) throw redirect(303, '/auth/login');
+  const profile = profiles[0];
 
-  // Aggregate player turnover volume to calculate accumulated points (1 KES/USD wagered = 1 point)
-  const betAggregates = await db.bet.aggregate({
-    where: {
-      profileId: locals.user.id,
-      status: { in: ['WON', 'LOST'] }
-    },
-    _sum: { stake: true }
-  });
+  // Aggregate total betting turnover from completed settled bets
+  const [betAggregates] = await db.execute<RowDataPacket[]>(
+    "SELECT SUM(stake) as totalTurnover FROM bets WHERE profile_id = ? AND status IN ('WON', 'LOST')",
+    [locals.user.id]
+  );
 
-  const pointsAccumulated = Math.floor(Number(betAggregates._sum.stake || 0));
+  const pointsAccumulated = Math.floor(Number(betAggregates[0].totalTurnover || 0));
 
-  const vipTiersRaw = await db.vipTier.findMany({
-    orderBy: { minPoints: 'asc' }
-  });
+  // Retrieve all configured loyalty level tiers in ascending order
+  const [tiers] = await db.execute<RowDataPacket[]>(
+    'SELECT id, name, min_points as minPoints, cashback_percent as cashbackPercent, bonus_percent as bonusPercent FROM vip_tiers ORDER BY min_points ASC'
+  );
 
-  // Serialize Decimal percentages inside the VIP tier objects
-  const serializedTiers = vipTiersRaw.map((tier) => ({
-    ...tier,
-    cashbackPercent: Number(tier.cashbackPercent),
+  const serializedTiers = tiers.map((tier) => ({
+    id: tier.id,
+    name: tier.name,
+    minPoints: tier.minPoints,
+    cashbackPercent: Number(tier.cashbackPercent), // Serialize decimal percentages
     bonusPercent: Number(tier.bonusPercent)
   }));
 
@@ -42,11 +48,23 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   return {
     profile: {
-      ...profile,
-      vipTier: profile.vipTier ? {
-        ...profile.vipTier,
-        cashbackPercent: Number(profile.vipTier.cashbackPercent),
-        bonusPercent: Number(profile.vipTier.bonusPercent)
+      id: profile.id,
+      email: profile.email,
+      username: profile.username,
+      fullName: profile.fullName,
+      phone: profile.phone,
+      country: profile.country,
+      currency: profile.currency,
+      referralCode: profile.referralCode,
+      referredBy: profile.referredBy,
+      vipTierId: profile.vipTierId,
+      createdAt: new Date(profile.createdAt),
+      vipTier: profile.vipTierId ? {
+        id: profile.vipTierId,
+        name: profile.vipTierName,
+        minPoints: profile.vipTierMinPoints,
+        cashbackPercent: Number(profile.vipTierCashback),
+        bonusPercent: Number(profile.vipTierBonus)
       } : null
     },
     pointsAccumulated,

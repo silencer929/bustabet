@@ -1,6 +1,7 @@
 import { redirect, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
+import type { RowDataPacket } from 'mysql2';
 import bcrypt from 'bcryptjs';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -25,21 +26,24 @@ export const actions: Actions = {
     }
 
     try {
-      const user = await db.user.findUnique({ where: { id: locals.user.id } });
+      const [user] = await db.execute<RowDataPacket[]>(
+        'SELECT * FROM users WHERE id = ?',
+        [locals.user.id]
+      );
       if (!user) throw new Error('User record not found');
 
       // Verify current password hash match
-      const isMatch = await bcrypt.compare(currentPassword, user.passwordHash);
+      const isMatch = await bcrypt.compare(currentPassword, user[0].passwordHash);
       if (!isMatch) {
         return fail(400, { error: 'Your current password is incorrect' });
       }
 
       const passwordHash = await bcrypt.hash(newPassword, 10);
 
-      await db.user.update({
-        where: { id: locals.user.id },
-        data: { passwordHash }
-      });
+      await db.execute<RowDataPacket[]>(
+        'UPDATE users SET passwordHash = ? WHERE id = ?',
+        [passwordHash, locals.user.id]
+      );
 
       return { success: true, message: 'Password updated successfully!' };
     } catch (error: any) {

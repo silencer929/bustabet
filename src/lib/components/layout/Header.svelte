@@ -51,7 +51,7 @@
         <Menu class="h-5 w-5" />
       </Button>
       <a href="/" class="flex items-center gap-2">
-        <span class="text-base font-black tracking-wider text-white">CHAMPION<span class="text-amber-500">BET</span></span>
+        <span class="text-base font-black tracking-wider text-white">BUSTA<span class="text-amber-500">BET</span></span>
       </a>
     </div>
 

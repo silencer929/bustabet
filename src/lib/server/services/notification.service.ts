@@ -41,28 +41,28 @@ export class NotificationService {
   static async sendRegistrationEmail(email: string, username: string): Promise<boolean> {
     const htmlTemplate = `
       <div style="background-color: #0a0a0a; color: #f5f5f5; font-family: sans-serif; padding: 40px; max-width: 600px; margin: 0 auto; border: 1px solid #262626; border-radius: 12px;">
-        <h2 style="color: #ffd11a; font-weight: 900; letter-spacing: 1px; border-b: 1px solid #262626; padding-bottom: 20px;">CHAMPION<span style="color: #f5f5f5;">BET</span></h2>
+        <h2 style="color: #ffd11a; font-weight: 900; letter-spacing: 1px; border-b: 1px solid #262626; padding-bottom: 20px;">BUSTAR<span style="color: #f5f5f5;">BET</span></h2>
         <p style="font-size: 14px; line-height: 1.6; color: #d4d4d4;">Hello <strong>${username}</strong>,</p>
-        <p style="font-size: 14px; line-height: 1.6; color: #d4d4d4;">Welcome to Champion Bet! Your account has been registered successfully. You can now deposit and place live sports wagers securely on our platform.</p>
+        <p style="font-size: 14px; line-height: 1.6; color: #d4d4d4;">Welcome to Bustar Bet! Your account has been registered successfully. You can now deposit and place live sports wagers securely on our platform.</p>
         <div style="margin: 30px 0; text-align: center;">
-          <a href="https://championbet.space/sportsbook" style="background-color: #ffd11a; color: #0a0a0a; padding: 12px 30px; font-size: 14px; font-weight: bold; text-decoration: none; border-radius: 8px; box-shadow: 0 0 10px rgba(255, 209, 26, 0.2);">Go to Sportsbook</a>
+          <a href="https://bustarbets.com/sportsbook" style="background-color: #ffd11a; color: #0a0a0a; padding: 12px 30px; font-size: 14px; font-weight: bold; text-decoration: none; border-radius: 8px; box-shadow: 0 0 10px rgba(255, 209, 26, 0.2);">Go to Sportsbook</a>
         </div>
         <p style="font-size: 11px; color: #737373; border-t: 1px solid #262626; pt: 20px; margin-top: 40px;">This is an automated operational system email. Please do not reply directly. Strictly 18+.</p>
       </div>
     `;
 
-    return await this.sendEmail(email, 'Welcome to Champion Bet!', htmlTemplate);
+    return await this.sendEmail(email, 'Welcome to Bustar Bet!', htmlTemplate);
   }
 
   // Sends a stylized password reset link (Remains unchanged)
   static async sendPasswordResetEmail(email: string, resetToken: string): Promise<boolean> {
-    const resetUrl = `https://championbet.space/auth/reset-password?token=${resetToken}`;
+    const resetUrl = `https://bustarbets.com/auth/reset-password?token=${resetToken}`;
     
     const htmlTemplate = `
       <div style="background-color: #0a0a0a; color: #f5f5f5; font-family: sans-serif; padding: 40px; max-width: 600px; margin: 0 auto; border: 1px solid #262626; border-radius: 12px;">
-        <h2 style="color: #ffd11a; font-weight: 900; letter-spacing: 1px; border-b: 1px solid #262626; padding-bottom: 20px;">CHAMPION<span style="color: #f5f5f5;">BET</span></h2>
+        <h2 style="color: #ffd11a; font-weight: 900; letter-spacing: 1px; border-b: 1px solid #262626; padding-bottom: 20px;">BUSTAR<span style="color: #f5f5f5;">BET</span></h2>
         <p style="font-size: 14px; line-height: 1.6; color: #d4d4d4;">Hello,</p>
-        <p style="font-size: 14px; line-height: 1.6; color: #d4d4d4;">We received a request to reset your Champion Bet account password. Click the secure link below to proceed with setting a new credential:</p>
+        <p style="font-size: 14px; line-height: 1.6; color: #d4d4d4;">We received a request to reset your Bustar Bet account password. Click the secure link below to proceed with setting a new credential:</p>
         <div style="margin: 30px 0; text-align: center;">
           <a href="${resetUrl}" style="background-color: #ffd11a; color: #0a0a0a; padding: 12px 30px; font-size: 14px; font-weight: bold; text-decoration: none; border-radius: 8px; box-shadow: 0 0 10px rgba(255, 209, 26, 0.2);">Reset Password</a>
         </div>
@@ -71,7 +71,7 @@ export class NotificationService {
       </div>
     `;
 
-    return await this.sendEmail(email, 'Reset Your Champion Bet Password', htmlTemplate);
+    return await this.sendEmail(email, 'Reset Your Bustar Bet Password', htmlTemplate);
   }
 
   // Returns all unread notifications, mapping snake_case keys back to camelCase variables

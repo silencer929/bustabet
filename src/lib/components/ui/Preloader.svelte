@@ -15,7 +15,7 @@
       
       <img 
         src="/logos/logo.png" 
-        alt="Champion Bet Loading" 
+        alt="Bustar Bet Loading" 
         class="absolute h-30 w-30 object-contain rounded-lg shadow-sm"
         onerror={(e) => {
           // ✅ Fixed: Explicitly cast target to an HTMLImageElement

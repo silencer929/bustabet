@@ -15,7 +15,7 @@
   let hasCopied = $state(false);
 
   // Computes the dynamic registration link appended with the player's custom referral code
-  const referralLink = $derived(`https://championbet.space/auth/register?ref=${data.referralCode}`);
+  const referralLink = $derived(`https://bustarbets.com/auth/register?ref=${data.referralCode}`);
 
   // Triggers clipboard write copy utilities and displays a sonner toast confirmation
   function handleCopy() {

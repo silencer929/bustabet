@@ -1,15 +1,16 @@
 import { redirect, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
+import type { RowDataPacket } from 'mysql2';
 import fs from 'fs';
 
 export const load: PageServerLoad = async ({ locals }) => {
   if (!locals.user) throw redirect(303, '/auth/login');
 
-  const documents = await db.verificationDoc.findMany({
-    where: { profileId: locals.user.id },
-    orderBy: { submittedAt: 'desc' }
-  });
+  const [documents] = await db.execute<RowDataPacket[]>(
+    'SELECT * FROM verificationDoc WHERE profile_id = ? ORDER BY submitted_at DESC',
+    [locals.user.id]
+  );
 
   return { documents };
 };
@@ -40,14 +41,10 @@ export const actions: Actions = {
       await fs.promises.writeFile(uploadPath, buffer);
       const fileUrl = `/uploads/${fileName}`;
 
-      await db.verificationDoc.create({
-        data: {
-          profileId: locals.user.id,
-          documentType,
-          fileUrl,
-          status: 'PENDING'
-        }
-      });
+      await db.execute<RowDataPacket[]>(
+        'INSERT INTO verificationDocs (profile_id, document_type, file_url, status, submitted_at) VALUES (?, ?, ?, ?, ?)',
+        [locals.user.id, documentType, fileUrl, 'PENDING', new Date()]
+      );
 
       return { success: true, message: 'Document submitted successfully! Our compliance team will review it.' };
     } catch (error: any) {

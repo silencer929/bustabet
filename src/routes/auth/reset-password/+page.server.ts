@@ -1,6 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
+import type { RowDataPacket } from 'mysql2';
 import bcrypt from 'bcryptjs';
 import { jwtVerify } from 'jose';
 import { JWT_SECRET as ENV_JWT_SECRET } from '$env/static/private';
@@ -50,12 +51,11 @@ export const actions: Actions = {
       }
 
       const passwordHash = await bcrypt.hash(password, 10);
-
-      // Update the user password in MySQL database
-      await db.user.update({
-        where: { id: payload.userId as string },
-        data: { passwordHash }
-      });
+      
+      const conn = await db.execute<RowDataPacket[]>(
+        'UPDATE users SET password_hash = ? WHERE id = ?',
+        [passwordHash, payload.userId as string]
+      );
 
       return { success: true, message: 'Your password has been reset successfully.' };
     } catch (error) {
