@@ -1,12 +1,12 @@
 import bcrypt from 'bcryptjs';
 import { SignJWT, jwtVerify } from 'jose';
-import { JWT_SECRET as ENV_JWT_SECRET } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 import { db } from '../db';
 import type { registerSchema, loginSchema } from '$lib/utils/validation';
 import type { z } from 'zod';
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 
-const JWT_SECRET = new TextEncoder().encode(ENV_JWT_SECRET || 'fallback-secure-secret-key-at-least-256-bits-long');
+const JWT_SECRET = new TextEncoder().encode(env.JWT_SECRET || 'fallback-secure-secret-key-at-least-256-bits-long');
 
 type RegisterInput = z.infer<typeof registerSchema>;
 type LoginInput = z.infer<typeof loginSchema>;
