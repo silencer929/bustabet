@@ -5,15 +5,34 @@ import type { RowDataPacket } from 'mysql2';
 
 export const load: PageServerLoad = async ({ url }) => {
   const searchQuery = url.searchParams.get('search');
+  const now = new Date();
 
+  // Safeguard 1: Automatically transition any passed upcoming games to 'LIVE' status
+  await db.execute(
+    `UPDATE admin_games 
+     SET status = 'LIVE' 
+     WHERE start_time <= ? AND status = 'UPCOMING'`,
+    [now]
+  );
+
+  // Safeguard 2: Automatically deactivate/suspend betting markets for any game that has started
+  await db.execute(
+    `UPDATE admin_game_markets m
+     INNER JOIN admin_games g ON m.game_id = g.id
+     SET m.active = 0
+     WHERE g.start_time <= ? AND m.active = 1`,
+    [now]
+  );
+
+  // Query only games that are LIVE/UPCOMING and started less than 4 hours ago
   let query = `
     SELECT id, sport, league, home_team as homeTeam, away_team as awayTeam, start_time as startTime, status
     FROM admin_games
     WHERE status IN ('UPCOMING', 'LIVE')
+      AND start_time >= DATE_SUB(NOW(), INTERVAL 4 HOUR)
   `;
   const params: any[] = [];
 
-  // Implement database-level SQL search parameter constraints if queried
   if (searchQuery) {
     query += ` AND (home_team LIKE ? OR away_team LIKE ? OR league LIKE ?)`;
     const searchWildcard = `%${searchQuery}%`;
@@ -29,9 +48,8 @@ export const load: PageServerLoad = async ({ url }) => {
   }
 
   const gameIds = games.map((g) => g.id);
-
-  // Retrieve and group active selection odds for the loaded fixtures
   const placeholders = gameIds.map(() => '?').join(',');
+
   const [markets] = await db.execute<RowDataPacket[]>(
     `SELECT id, game_id as gameId, market_name as marketName, selection, odds, active
      FROM admin_game_markets
@@ -54,7 +72,7 @@ export const load: PageServerLoad = async ({ url }) => {
         gameId: m.gameId,
         marketName: m.marketName,
         selection: m.selection,
-        odds: Number(m.odds), // Ensure odds serialize safely as standard numbers
+        odds: Number(m.odds),
         active: Boolean(m.active)
       }))
   }));

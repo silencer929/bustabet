@@ -1,41 +1,60 @@
 import { fail, redirect, error } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
-import type { RowDataPacket } from 'mysql2';
 import type { GameWithMarkets } from '$lib/types/game';
+import type { RowDataPacket } from 'mysql2';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
+  // Double-verify admin roles before loading detailed fixture managers
   if (!locals.user || locals.user.user.role !== 'ADMIN') {
     throw redirect(303, '/sportsbook');
   }
 
-  const [gamesRaw] = await db.execute<RowDataPacket[]>(
-    'SELECT g.*, m.id AS marketId, m.marketName, m.selection, m.odds, m.active FROM games g LEFT JOIN adminGameMarkets m ON g.id = m.gameId WHERE g.id = ?',
+  // Load single match metadata using SQL
+  const [games] = await db.execute<RowDataPacket[]>(
+    `SELECT id, sport, league, home_team as homeTeam, away_team as awayTeam, start_time as startTime, status 
+     FROM admin_games 
+     WHERE id = ? LIMIT 1`,
     [params.id]
   );
 
-  if (!gamesRaw.length) {
-    throw error(404, 'Fixture not found');
+  if (games.length === 0) {
+    throw error(404, 'Fixture match not found');
   }
 
-  const serializedGame: GameWithMarkets = {
-    ...gamesRaw[0],
-    markets: gamesRaw
-      .filter((row) => row.marketId)
-      .map((row) => ({
-        id: row.marketId,
-        marketName: row.marketName,
-        selection: row.selection,
-        odds: Number(row.odds),
-        active: Boolean(row.active)
-      }))
+  const game = games[0];
+
+  // Retrieve all configured market selection lines associated with this match ID
+  const [markets] = await db.execute<RowDataPacket[]>(
+    `SELECT id, game_id as gameId, market_name as marketName, selection, odds, active 
+     FROM admin_game_markets 
+     WHERE game_id = ?`,
+    [params.id]
+  );
+
+  const gameWithMarkets: GameWithMarkets = {
+    id: game.id,
+    sport: game.sport,
+    league: game.league,
+    homeTeam: game.homeTeam,
+    awayTeam: game.awayTeam,
+    startTime: new Date(game.startTime),
+    status: game.status,
+    markets: markets.map((m) => ({
+      id: m.id,
+      gameId: m.gameId,
+      marketName: m.marketName,
+      selection: m.selection,
+      odds: Number(m.odds), // Safely serialize decimal pricing values
+      active: Boolean(m.active)
+    }))
   };
 
-  return { game: serializedGame };
+  return { game: gameWithMarkets };
 };
 
 export const actions: Actions = {
-  // Adds a completely new market selection line (e.g., Draw No Bet options or Over/Under goals)
+  // Manually adds a completely new market selection line (e.g., Draw No Bet or Over/Under goals)
   addMarketOption: async ({ request, params }) => {
     const formData = await request.formData();
     const marketName = formData.get('marketName') as string;
@@ -48,17 +67,19 @@ export const actions: Actions = {
     }
 
     try {
+      const marketId = crypto.randomUUID();
       await db.execute(
-        'INSERT INTO adminGameMarkets (id, gameId, marketName, selection, odds, active) VALUES (?, ?, ?, ?, ?, 1)',
-        [crypto.randomUUID(), params.id, marketName, selection, odds]
+        `INSERT INTO admin_game_markets (id, game_id, market_name, selection, odds, active) 
+         VALUES (?, ?, ?, ?, ?, 1)`,
+        [marketId, params.id, marketName, selection, odds]
       );
       return { success: true };
     } catch {
-      return fail(500, { error: 'Failed to create market option' });
+      return fail(500, { error: 'Failed to create custom market selection line' });
     }
   },
 
-  // Updates current odds value
+  // Overrides the decimal price of an existing selection line
   updateOdds: async ({ request }) => {
     const formData = await request.formData();
     const marketId = formData.get('marketId') as string;
@@ -71,7 +92,7 @@ export const actions: Actions = {
 
     try {
       await db.execute(
-        'UPDATE adminGameMarkets SET odds = ? WHERE id = ?',
+        'UPDATE admin_game_markets SET odds = ? WHERE id = ?',
         [odds, marketId]
       );
       return { success: true };
@@ -88,12 +109,12 @@ export const actions: Actions = {
 
     try {
       await db.execute(
-        'UPDATE adminGameMarkets SET active = ? WHERE id = ?',
-        [activeStr === 'true', marketId]
+        'UPDATE admin_game_markets SET active = ? WHERE id = ?',
+        [activeStr === 'true' ? 1 : 0, marketId]
       );
       return { success: true };
     } catch {
-      return fail(500, { error: 'Failed to toggle status' });
+      return fail(500, { error: 'Failed to toggle market status' });
     }
   },
 
@@ -104,7 +125,7 @@ export const actions: Actions = {
 
     try {
       await db.execute(
-        'DELETE FROM adminGameMarkets WHERE id = ?',
+        'DELETE FROM admin_game_markets WHERE id = ?',
         [marketId]
       );
       return { success: true };

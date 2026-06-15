@@ -31,14 +31,14 @@ export const load: PageServerLoad = async () => {
   
   // Query the total count of open support tickets
   const [openTicketsRaw] = await db.execute<RowDataPacket[]>(
-    'SELECT COUNT(*) AS openTicketsCount FROM supportConversations WHERE status = ?',
+    'SELECT COUNT(*) AS openTicketsCount FROM support_conversations WHERE status = ?',
     ['OPEN']
   );
   const openTicketsCount = openTicketsRaw[0].openTicketsCount as number;
 
   // Query the total count of pending KYC identity documents awaiting audit
   const [pendingKycRaw] = await db.execute<RowDataPacket[]>(
-    'SELECT COUNT(*) AS pendingKycCount FROM verificationDocs WHERE status = ?',
+    'SELECT COUNT(*) AS pendingKycCount FROM verification_documents WHERE status = ?',
     ['PENDING']
   );
   const pendingKycCount = pendingKycRaw[0].pendingKycCount as number;
@@ -50,7 +50,7 @@ export const load: PageServerLoad = async () => {
   const settledStakes = { _sum: { stake: settledStakesRaw[0].totalTurnover as number || 0 } };
 
   const [settledPayoutsRaw] = await db.execute<RowDataPacket[]>(
-    'SELECT SUM(potentialWin) AS totalPayouts FROM bets WHERE status = ?',
+    'SELECT SUM(potential_win) AS totalPayouts FROM bets WHERE status = ?',
     ['WON']
   );
   const settledPayouts = { _sum: { potentialWin: settledPayoutsRaw[0].totalPayouts as number || 0 } };

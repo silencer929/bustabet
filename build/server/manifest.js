@@ -10,48 +10,49 @@ return {
 	assets: new Set(["icons/android-chrome-512x512.png","icons/apple-touch-icon.png","icons/favicon-16x16.png","icons/favicon-32x32.png","icons/favicon.ico","logos/logo.png","robots.txt"]),
 	mimeTypes: {".png":"image/png",".txt":"text/plain"},
 	_: {
-		client: {start:"_app/immutable/entry/start.CvQvgw-1.js",app:"_app/immutable/entry/app.D9vA5vKQ.js",imports:["_app/immutable/entry/start.CvQvgw-1.js","_app/immutable/chunks/BseN1Bqw.js","_app/immutable/chunks/ByXn1zri.js","_app/immutable/entry/app.D9vA5vKQ.js","_app/immutable/chunks/ByXn1zri.js","_app/immutable/chunks/kNaey6uv.js","_app/immutable/chunks/xihTtKlq.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:false},
+		client: {start:"_app/immutable/entry/start.D3Dq6wPQ.js",app:"_app/immutable/entry/app.BZWgixCO.js",imports:["_app/immutable/entry/start.D3Dq6wPQ.js","_app/immutable/chunks/D3Q1pEpz.js","_app/immutable/chunks/ByXn1zri.js","_app/immutable/entry/app.BZWgixCO.js","_app/immutable/chunks/ByXn1zri.js","_app/immutable/chunks/kNaey6uv.js","_app/immutable/chunks/xihTtKlq.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:false},
 		nodes: [
-			__memo(() => import('./chunks/0-Di43SWuc.js')),
-			__memo(() => import('./chunks/1-cAB8sVC2.js')),
-			__memo(() => import('./chunks/2-jwAIVFvV.js')),
+			__memo(() => import('./chunks/0-CyTNbFPd.js')),
+			__memo(() => import('./chunks/1-DtEOJA3J.js')),
+			__memo(() => import('./chunks/2-BrvyUxnY.js')),
 			__memo(() => import('./chunks/3-CH3BHKyB.js')),
-			__memo(() => import('./chunks/4-BPlbdUQ5.js')),
-			__memo(() => import('./chunks/5-Bek0JCjp.js')),
-			__memo(() => import('./chunks/6-C0PDzI_h.js')),
-			__memo(() => import('./chunks/7-DMMDi2M0.js')),
+			__memo(() => import('./chunks/4-Dd19zmbO.js')),
+			__memo(() => import('./chunks/5-CfsH47tm.js')),
+			__memo(() => import('./chunks/6-lr32nyBR.js')),
+			__memo(() => import('./chunks/7-DJlRDw9y.js')),
 			__memo(() => import('./chunks/8-BdwC-QSz.js')),
 			__memo(() => import('./chunks/9-B9HsWWMg.js')),
 			__memo(() => import('./chunks/10-CfPLG6Hr.js')),
-			__memo(() => import('./chunks/11-D3QgbtvV.js')),
-			__memo(() => import('./chunks/12-DmvaG3SW.js')),
-			__memo(() => import('./chunks/13-DLkS9CTP.js')),
-			__memo(() => import('./chunks/14-DdHKiSte.js')),
-			__memo(() => import('./chunks/15-C5_hWo9i.js')),
+			__memo(() => import('./chunks/11-DEARc5rX.js')),
+			__memo(() => import('./chunks/12-BwNWf7rl.js')),
+			__memo(() => import('./chunks/13-D1SG_p78.js')),
+			__memo(() => import('./chunks/14-B2ruyfYQ.js')),
+			__memo(() => import('./chunks/15-DVcFQlhv.js')),
 			__memo(() => import('./chunks/16-Dtl1HX_s.js')),
-			__memo(() => import('./chunks/17-BTmZiMtt.js')),
-			__memo(() => import('./chunks/18-BlYr2ftf.js')),
-			__memo(() => import('./chunks/19-BNkIHWc8.js')),
-			__memo(() => import('./chunks/20-CtjGRzGB.js')),
-			__memo(() => import('./chunks/21-COqdoHEq.js')),
-			__memo(() => import('./chunks/22-B6O0N5_1.js')),
-			__memo(() => import('./chunks/23-D2fC4EPM.js')),
-			__memo(() => import('./chunks/24-C-WsQ0b2.js')),
-			__memo(() => import('./chunks/25-BeWYz-il.js')),
-			__memo(() => import('./chunks/26-DPh3ZO6S.js')),
-			__memo(() => import('./chunks/27-2q3Ete2z.js')),
-			__memo(() => import('./chunks/28-DSASUOFo.js')),
-			__memo(() => import('./chunks/29-CgJY5oFL.js')),
-			__memo(() => import('./chunks/30-wvmrMpmi.js')),
-			__memo(() => import('./chunks/31-CpKqx5l1.js')),
-			__memo(() => import('./chunks/32-CBGk49Nd.js')),
-			__memo(() => import('./chunks/33-Z_1_Krhp.js')),
-			__memo(() => import('./chunks/34-DeKuxG1v.js')),
-			__memo(() => import('./chunks/35-Ce69cUN7.js')),
-			__memo(() => import('./chunks/36-D0pS29cb.js')),
-			__memo(() => import('./chunks/37-BmVDBZdT.js')),
-			__memo(() => import('./chunks/38-CqBEsouR.js')),
-			__memo(() => import('./chunks/39-CUVW0b57.js'))
+			__memo(() => import('./chunks/17-DHndVlR5.js')),
+			__memo(() => import('./chunks/18-Bnr7siZg.js')),
+			__memo(() => import('./chunks/19-DfAyy2s_.js')),
+			__memo(() => import('./chunks/20-BjMLZB0z.js')),
+			__memo(() => import('./chunks/21-D6LGCLyt.js')),
+			__memo(() => import('./chunks/22-BnD7P1ro.js')),
+			__memo(() => import('./chunks/23-wnnS0lHH.js')),
+			__memo(() => import('./chunks/24-DORBWsYf.js')),
+			__memo(() => import('./chunks/25-BckDWCpN.js')),
+			__memo(() => import('./chunks/26-TWLsry05.js')),
+			__memo(() => import('./chunks/27-BWnYWOJ5.js')),
+			__memo(() => import('./chunks/28-C9Iq0Qec.js')),
+			__memo(() => import('./chunks/29-kolv9cNo.js')),
+			__memo(() => import('./chunks/30-21U3BJQx.js')),
+			__memo(() => import('./chunks/31-RoTvl0G1.js')),
+			__memo(() => import('./chunks/32-RMfHkNP9.js')),
+			__memo(() => import('./chunks/33-BbDPtpcr.js')),
+			__memo(() => import('./chunks/34-RPCJ-9L_.js')),
+			__memo(() => import('./chunks/35-BypIdgsF.js')),
+			__memo(() => import('./chunks/36-B4JmMp_4.js')),
+			__memo(() => import('./chunks/37-Cl2u8DY8.js')),
+			__memo(() => import('./chunks/38-dIa7HntZ.js')),
+			__memo(() => import('./chunks/39-CM6g7ZCY.js')),
+			__memo(() => import('./chunks/40-BkL1Ch9Z.js'))
 		],
 		remotes: {
 			
@@ -177,164 +178,171 @@ return {
 				endpoint: __memo(() => import('./chunks/_server.ts-DSwzOe6_.js'))
 			},
 			{
+				id: "/auth",
+				pattern: /^\/auth\/?$/,
+				params: [],
+				page: { layouts: [0,], errors: [1,], leaf: 17 },
+				endpoint: null
+			},
+			{
 				id: "/auth/forgot-password",
 				pattern: /^\/auth\/forgot-password\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 17 },
+				page: { layouts: [0,], errors: [1,], leaf: 18 },
 				endpoint: null
 			},
 			{
 				id: "/auth/login",
 				pattern: /^\/auth\/login\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 18 },
+				page: { layouts: [0,], errors: [1,], leaf: 19 },
 				endpoint: null
 			},
 			{
 				id: "/auth/logout",
 				pattern: /^\/auth\/logout\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 19 },
+				page: { layouts: [0,], errors: [1,], leaf: 20 },
 				endpoint: null
 			},
 			{
 				id: "/auth/register",
 				pattern: /^\/auth\/register\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 20 },
+				page: { layouts: [0,], errors: [1,], leaf: 21 },
 				endpoint: null
 			},
 			{
 				id: "/auth/reset-password",
 				pattern: /^\/auth\/reset-password\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 21 },
+				page: { layouts: [0,], errors: [1,], leaf: 22 },
 				endpoint: null
 			},
 			{
 				id: "/notifications",
 				pattern: /^\/notifications\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 22 },
+				page: { layouts: [0,], errors: [1,], leaf: 23 },
 				endpoint: null
 			},
 			{
 				id: "/profile",
 				pattern: /^\/profile\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 23 },
+				page: { layouts: [0,], errors: [1,], leaf: 24 },
 				endpoint: null
 			},
 			{
 				id: "/profile/preferences",
 				pattern: /^\/profile\/preferences\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 24 },
+				page: { layouts: [0,], errors: [1,], leaf: 25 },
 				endpoint: null
 			},
 			{
 				id: "/profile/security",
 				pattern: /^\/profile\/security\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 25 },
+				page: { layouts: [0,], errors: [1,], leaf: 26 },
 				endpoint: null
 			},
 			{
 				id: "/profile/verification",
 				pattern: /^\/profile\/verification\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 26 },
+				page: { layouts: [0,], errors: [1,], leaf: 27 },
 				endpoint: null
 			},
 			{
 				id: "/promotions",
 				pattern: /^\/promotions\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 27 },
+				page: { layouts: [0,], errors: [1,], leaf: 28 },
 				endpoint: null
 			},
 			{
 				id: "/referrals",
 				pattern: /^\/referrals\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 28 },
+				page: { layouts: [0,], errors: [1,], leaf: 29 },
 				endpoint: null
 			},
 			{
 				id: "/sportsbook",
 				pattern: /^\/sportsbook\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 29 },
+				page: { layouts: [0,], errors: [1,], leaf: 30 },
 				endpoint: null
 			},
 			{
 				id: "/sportsbook/match/[id]",
 				pattern: /^\/sportsbook\/match\/([^/]+?)\/?$/,
 				params: [{"name":"id","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,], errors: [1,], leaf: 30 },
+				page: { layouts: [0,], errors: [1,], leaf: 31 },
 				endpoint: null
 			},
 			{
 				id: "/sportsbook/[sport]",
 				pattern: /^\/sportsbook\/([^/]+?)\/?$/,
 				params: [{"name":"sport","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,], errors: [1,], leaf: 31 },
+				page: { layouts: [0,], errors: [1,], leaf: 32 },
 				endpoint: null
 			},
 			{
 				id: "/support",
 				pattern: /^\/support\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 32 },
+				page: { layouts: [0,], errors: [1,], leaf: 33 },
 				endpoint: null
 			},
 			{
 				id: "/support/new",
 				pattern: /^\/support\/new\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 33 },
+				page: { layouts: [0,], errors: [1,], leaf: 34 },
 				endpoint: null
 			},
 			{
 				id: "/support/[ticketId]",
 				pattern: /^\/support\/([^/]+?)\/?$/,
 				params: [{"name":"ticketId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,], errors: [1,], leaf: 34 },
+				page: { layouts: [0,], errors: [1,], leaf: 35 },
 				endpoint: null
 			},
 			{
 				id: "/vip",
 				pattern: /^\/vip\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 35 },
+				page: { layouts: [0,], errors: [1,], leaf: 36 },
 				endpoint: null
 			},
 			{
 				id: "/wallet",
 				pattern: /^\/wallet\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 36 },
+				page: { layouts: [0,], errors: [1,], leaf: 37 },
 				endpoint: null
 			},
 			{
 				id: "/wallet/deposit",
 				pattern: /^\/wallet\/deposit\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 37 },
+				page: { layouts: [0,], errors: [1,], leaf: 38 },
 				endpoint: null
 			},
 			{
 				id: "/wallet/history",
 				pattern: /^\/wallet\/history\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 38 },
+				page: { layouts: [0,], errors: [1,], leaf: 39 },
 				endpoint: null
 			},
 			{
 				id: "/wallet/withdraw",
 				pattern: /^\/wallet\/withdraw\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 39 },
+				page: { layouts: [0,], errors: [1,], leaf: 40 },
 				endpoint: null
 			}
 		],
