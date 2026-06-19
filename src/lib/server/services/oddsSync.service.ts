@@ -3,9 +3,9 @@ import { OddsApiService } from './oddsApi.service';
 import type { RowDataPacket } from 'mysql2';
 
 export class OddsSyncService {
-  // Syncs and caches active game fixtures and odds for a specific sport key using raw SQL
-  static async syncSportOdds(sportKey: string): Promise<void> {
-    const rawOdds = await OddsApiService.getOdds(sportKey);
+  // Mode A: Standard baseline sync (Cost: 1 Credit). Syncs H2H, Spreads, and Totals globally.
+  static async syncSportOddsStandard(sportKey: string): Promise<void> {
+    const rawOdds = await OddsApiService.getOdds(sportKey, 'us,eu', 'h2h,spreads,totals');
     const conn = await db.getConnection();
 
     try {
@@ -16,7 +16,7 @@ export class OddsSyncService {
 
         await conn.beginTransaction();
 
-        // Check if the game fixture already exists in the admin_games table
+        // Upsert match fixture details into the admin_games table
         const [existingGames] = await conn.execute<RowDataPacket[]>(
           'SELECT id FROM admin_games WHERE id = ? LIMIT 1',
           [match.id]
@@ -34,23 +34,22 @@ export class OddsSyncService {
           );
         }
 
-        // Skip parsing markets if no bookmakers are returned
         if (!match.bookmakers || match.bookmakers.length === 0) {
           await conn.commit();
           continue;
         }
 
-        const primaryBookmaker = match.bookmakers[0];
+        // Use Pinnacle as the sharp bookmaker reference, fallback to first available
+        const bookmaker = match.bookmakers.find(b => b.key === 'pinnacle') || match.bookmakers[0];
 
-        // Deactivate all old cached markets for this game before writing updated ones
+        // Deactivate old active records for these specific standard markets only
         await conn.execute(
-          'UPDATE admin_game_markets SET active = 0 WHERE game_id = ?',
+          "UPDATE admin_game_markets SET active = 0 WHERE game_id = ? AND market_name IN ('h2h', 'spreads', 'totals')",
           [match.id]
         );
 
-        for (const market of primaryBookmaker.markets) {
+        for (const market of bookmaker.markets) {
           for (const outcome of market.outcomes) {
-            // Uniquely identify the option based on game, market type, and selection name
             const [existingMarkets] = await conn.execute<RowDataPacket[]>(
               'SELECT id FROM admin_game_markets WHERE game_id = ? AND market_name = ? AND selection = ? LIMIT 1',
               [match.id, market.key, outcome.name]
@@ -62,10 +61,9 @@ export class OddsSyncService {
                 [outcome.price, existingMarkets[0].id]
               );
             } else {
-              const marketId = crypto.randomUUID();
               await conn.execute(
                 'INSERT INTO admin_game_markets (id, game_id, market_name, selection, odds, active) VALUES (?, ?, ?, ?, ?, 1)',
-                [marketId, match.id, market.key, outcome.name, outcome.price]
+                [crypto.randomUUID(), match.id, market.key, outcome.name, outcome.price]
               );
             }
           }
@@ -73,6 +71,62 @@ export class OddsSyncService {
 
         await conn.commit();
       }
+    } catch (error) {
+      await conn.rollback();
+      throw error;
+    } finally {
+      conn.release();
+    }
+  }
+
+  // Mode B: Deep Event Harvest. Discovers and syncs ALL available advanced lines (props, periods)
+  static async syncEventOddsDeep(sportKey: string, eventId: string): Promise<void> {
+    const harvestedData = await OddsApiService.harvestEvent(sportKey, eventId);
+    const conn = await db.getConnection();
+
+    try {
+      await conn.beginTransaction();
+
+      // Deactivate all old cached market selections for this deep-sync event
+      await conn.execute(
+        'UPDATE admin_game_markets SET active = 0 WHERE game_id = ?',
+        [eventId]
+      );
+
+      // Map to ensure we do not write duplicate selections from multiple bookmakers
+      const processedSelections = new Set<string>();
+
+      for (const bookmaker of harvestedData.bookmakers) {
+        for (const market of bookmaker.markets) {
+          for (const outcome of market.outcomes) {
+            const selectionKey = `${market.key}-${outcome.name}`;
+            
+            // Skip if this selection has already been imported from a sharper bookmaker
+            if (processedSelections.has(selectionKey)) continue;
+
+            const [existingMarkets] = await conn.execute<RowDataPacket[]>(
+              'SELECT id FROM admin_game_markets WHERE game_id = ? AND market_name = ? AND selection = ? LIMIT 1',
+              [eventId, market.key, outcome.name]
+            );
+
+            if (existingMarkets.length > 0) {
+              await conn.execute(
+                'UPDATE admin_game_markets SET odds = ?, active = 1 WHERE id = ?',
+                [outcome.price, existingMarkets[0].id]
+              );
+            } else {
+              await conn.execute(
+                'INSERT INTO admin_game_markets (id, game_id, market_name, selection, odds, active) VALUES (?, ?, ?, ?, ?, 1)',
+                [crypto.randomUUID(), eventId, market.key, outcome.name, outcome.price]
+              );
+            }
+
+            processedSelections.add(selectionKey);
+          }
+        }
+      }
+
+      await conn.commit();
     } catch (error) {
       await conn.rollback();
       throw error;

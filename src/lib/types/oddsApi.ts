@@ -8,47 +8,55 @@ export interface Sport {
   has_outrights: boolean;
 }
 
-// Single market outcome details representing active selections
-export interface Outcome {
-  name: string;
-  price: number;
-  point?: number;
-  description?: string;
-}
-
-// Active market details for a bookmaker
-export interface Market {
-  key: string; // h2h, spreads, totals, outrights
-  last_update: string;
-  outcomes: Outcome[];
-}
-
-// Bookmaker payload from the odds endpoint
-export interface Bookmaker {
-  key: string;
-  title: string;
-  last_update: string;
-  markets: Market[];
-}
-
-// Event odds response payload
-export interface OddsResponse {
-  id: string; // matches the admin_game.id PK
+export interface Event {
+  id: string;
   sport_key: string;
   sport_title: string;
   commence_time: string;
   home_team: string;
   away_team: string;
-  bookmakers: Bookmaker[];
 }
 
-// Outcome representation of scores from the scores endpoint
-export interface ScoreOutcome {
-  name: string;
-  score: string;
+export interface EventMarketsResponse {
+  id: string;
+  sport_key: string;
+  sport_title: string;
+  commence_time: string;
+  home_team: string;
+  away_team: string;
+  bookmakers: Array<{
+    key: string;
+    title: string;
+    markets: Array<{
+      key: string;
+      last_update: string;
+    }>;
+  }>;
 }
 
-// Scores response payload for settling wagers
+export interface OddsResponse {
+  id: string;
+  sport_key: string;
+  sport_title: string;
+  commence_time: string;
+  home_team: string;
+  away_team: string;
+  bookmakers: Array<{
+    key: string;
+    title: string;
+    markets: Array<{
+      key: string;
+      last_update: string;
+      outcomes: Array<{
+        name: string;
+        price: number;
+        point?: number;
+        description?: string;
+      }>;
+    }>;
+  }>;
+}
+
 export interface ScoreResponse {
   id: string;
   sport_key: string;
@@ -57,6 +65,8 @@ export interface ScoreResponse {
   completed: boolean;
   home_team: string;
   away_team: string;
-  scores: ScoreOutcome[] | null;
-  last_update: string | null;
+  scores?: Array<{
+    name: string;
+    score: string;
+  }>;
 }
