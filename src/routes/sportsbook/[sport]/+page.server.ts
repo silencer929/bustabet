@@ -4,25 +4,30 @@ import { db } from '$lib/server/db';
 import type { GameWithMarkets } from '$lib/types/game';
 import type { RowDataPacket } from 'mysql2';
 
-const SPORT_KEY_MAP: Record<string, { key: string; title: string }> = {
-  'football': { key: 'soccer_english_premier_league', title: 'Premier League Football' },
-  'nba': { key: 'basketball_nba', title: 'NBA Basketball' },
-  'euroleague': { key: 'basketball_euroleague', title: 'Euroleague Basketball' },
-  'nhl': { key: 'icehockey_nhl', title: 'NHL Hockey' },
-  'nfl': { key: 'americanfootball_nfl', title: 'NFL Football' },
-  'mlb': { key: 'baseball_mlb', title: 'MLB Baseball' },
-  'mma': { key: 'mma', title: 'MMA' },
-  'tennis-atp': { key: 'tennis_atp_singles', title: 'Tennis ATP' },
-  'tennis-wta': { key: 'tennis_wta_singles', title: 'Tennis WTA' },
-  'rugby-nrl': { key: 'rugby_nrl', title: 'Rugby NRL' },
-  'afl': { key: 'afl', title: 'AFL Australian Rules' }
+// Maps dynamic URL slugs to MySQL wildcard search patterns
+const CATEGORY_MAP: Record<string, { pattern: string; title: string }> = {
+  'football': { pattern: 'soccer_%', title: 'Football / Soccer' },
+  'soccer': { pattern: 'soccer_%', title: 'Football / Soccer' },
+  'basketball': { pattern: 'basketball_%', title: 'Basketball' },
+  'nba': { pattern: 'basketball_nba', title: 'NBA Basketball' },
+  'euroleague': { pattern: 'basketball_euroleague', title: 'Euroleague Basketball' },
+  'nhl': { pattern: 'icehockey_nhl', title: 'NHL Hockey' },
+  'nfl': { pattern: 'americanfootball_nfl', title: 'NFL Football' },
+  'mlb': { pattern: 'baseball_mlb', title: 'MLB Baseball' },
+  'mma': { pattern: 'mma%', title: 'MMA' },
+  'tennis-atp': { pattern: 'tennis_atp_singles', title: 'Tennis ATP' },
+  'tennis-wta': { pattern: 'tennis_wta_singles', title: 'Tennis WTA' },
+  'tennis': { pattern: 'tennis_%', title: 'Tennis' },
+  'rugby-nrl': { pattern: 'rugby_nrl', title: 'Rugby NRL' },
+  'afl': { pattern: 'afl', title: 'AFL Australian Rules' }
 };
 
 export const load: PageServerLoad = async ({ params }) => {
   const sportSlug = params.sport ? params.sport.toLowerCase() : '';
-  const config = SPORT_KEY_MAP[sportSlug];
+  const config = CATEGORY_MAP[sportSlug];
 
-  if (!config || !config.key) {
+  // Safeguard: Throw 404 immediately to protect database from executing undefined parameters
+  if (!config) {
     throw error(404, 'Sport category not found');
   }
 
@@ -45,14 +50,14 @@ export const load: PageServerLoad = async ({ params }) => {
     [now]
   );
 
-  // Query only games that are LIVE/UPCOMING and started less than 4 hours ago for this category
+  // Query games using the MySQL LIKE operator (e.g. matching all sports starting with 'soccer_')
   const [games] = await db.execute<RowDataPacket[]>(
     `SELECT id, sport, league, home_team as homeTeam, away_team as awayTeam, start_time as startTime, status
      FROM admin_games
-     WHERE sport = ? AND status IN ('UPCOMING', 'LIVE')
+     WHERE sport LIKE ? AND status IN ('UPCOMING', 'LIVE')
        AND start_time >= DATE_SUB(NOW(), INTERVAL 4 HOUR)
      ORDER BY start_time ASC`,
-    [config.key]
+    [config.pattern]
   );
 
   if (games.length === 0) {

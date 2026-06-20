@@ -22,7 +22,12 @@ export class OddsSyncService {
     'soccer_norway_eliteserien',
     'soccer_spain_segunda_division',
     'soccer_sweden_allsvenskan',
-    'soccer_sweden_superettan'
+    'soccer_sweden_superettan',
+    'americanfootball_cfl',
+    'americanfootball_ncaaf',
+    'americanfootball_ncaaf_championship_winner',
+    'americanfootball_nfl',
+    'americanfootball_nfl_preseason'
   ];
 
   private static cacheLock = new Map<string, number>();
