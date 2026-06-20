@@ -110,7 +110,7 @@
       {#each betslip.selections as selection}
         <div class="relative rounded-lg border border-border bg-background/40 p-3 shadow-sm">
           <button 
-            onclick={() => betslip.removeSelection(selection.gameId)}
+            onclick={() => betslip.removeSelection(selection.gameId, selection.marketName)}
             class="absolute top-2.5 right-2.5 text-neutral-500 hover:text-foreground transition"
           >
             <X class="h-3.5 w-3.5" />

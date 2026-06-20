@@ -24,18 +24,22 @@ class BetSlipStore {
       : 0
   );
 
-  // Adds a selection to the betslip, replacing any existing selection for the same game
+  // Adds a selection, enforcing that only one option is chosen per market category (marketName) per game
   addSelection(selection: BetSlipSelection) {
-    const filtered = this.selections.filter((s) => s.gameId !== selection.gameId);
+    const filtered = this.selections.filter(
+      (s) => !(s.gameId === selection.gameId && s.marketName === selection.marketName)
+    );
     
     // Reassignment (= [...]) forces Svelte 5 to trigger reactive rendering instantly
     this.selections = [...filtered, selection];
   }
 
-  // Removes a selection from the slip by its associated game ID
-  removeSelection(gameId: string) {
+  // Removes a specific selection from the slip by its compound game ID and market category name
+  removeSelection(gameId: string, marketName: string) {
     // Reassignment forces Svelte 5 to trigger reactive rendering instantly
-    this.selections = this.selections.filter((s) => s.gameId !== gameId);
+    this.selections = this.selections.filter(
+      (s) => !(s.gameId === gameId && s.marketName === marketName)
+    );
   }
 
   // Updates the active stake amount
