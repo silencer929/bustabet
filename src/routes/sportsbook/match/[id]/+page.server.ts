@@ -33,7 +33,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
   // 3. Query the updated match metadata from MySQL
   const [gameRaw] = await db.execute<RowDataPacket[]>(
-    `SELECT id, sport, league, home_team as homeTeam, away_team as awayTeam, start_time as startTime, status 
+    `SELECT id, sport, league, home_team as homeTeam, away_team as awayTeam, start_time as startTime, status, home_score as homeScore, away_score as awayScore
      FROM admin_games 
      WHERE id = ? LIMIT 1`,
     [params.id]

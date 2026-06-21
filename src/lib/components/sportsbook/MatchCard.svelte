@@ -5,10 +5,15 @@
   import { Badge } from '$lib/components/ui/badge';
   import { Clock } from 'lucide-svelte';
 
-  let { game, activeMarket = 'h2h' } = $props<{ game: GameWithMarkets; activeMarket?: string }>();
+  // Svelte 5 properties: accepts activeMarket parameter (defaults to h2h)
+  let { game, activeMarket = 'h2h' } = $props<{ 
+    game: GameWithMarkets & { homeScore?: number; awayScore?: number }; 
+    activeMarket?: string; 
+  }>();
 
+  // Derived filter to automatically update displayed odds when the market selector changes
   const filteredMarkets = $derived(
-    game.markets.filter((m) => m.marketName === activeMarket && m.active)
+    game.markets.filter((m: any) => m.marketName === activeMarket && m.active)
   );
 
   // Deterministic sorting helper to force standard H2H odds layout (1 - X - 2) on the dashboard
@@ -32,13 +37,35 @@
 
   const isLive = $derived(game.status === 'LIVE');
 
+  // Calculates and displays the relative countdown timer (e.g. "4d 7h")
+  const remainingTime = $derived.by(() => {
+    const diffMs = new Date(game.startTime).getTime() - new Date().getTime();
+    if (diffMs <= 0) return 'Live';
+    const diffMins = Math.floor(diffMs / 60000);
+    const days = Math.floor(diffMins / 1440);
+    const hours = Math.floor((diffMins % 1440) / 60);
+    return `${days}d ${hours}h`;
+  });
+
+  // Formats date/time structure matching the reference (e.g. "Jun 11, 10:00 PM")
+  const formattedDate = $derived.by(() => {
+    return new Date(game.startTime).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  });
+
+  // Counts extra markets available for the detailed match page
   const extraMarketsCount = $derived(
-    new Set(game.markets.filter((m) => m.marketName !== 'h2h').map((m) => m.marketName)).size
+    new Set(game.markets.filter((m:any) => m.marketName !== 'h2h').map((m:any) => m.marketName)).size
   );
 </script>
 
-<div class="rounded-xl border border-border bg-card p-5 shadow-sm transition-all hover:border-neutral-300 dark:hover:border-neutral-700/80 flex flex-col justify-between h-58 min-w-[280px]">
-  <!-- Top: League Name (Left) & Countdown Timer (Right) -->
+<!-- bg-card and border-border automatically adapt to theme toggles -->
+<div class="rounded-xl border border-border bg-card p-5 shadow-sm transition-all hover:border-neutral-400 dark:hover:border-neutral-700 flex flex-col justify-between h-58 min-w-[280px]">
+  <!-- Top Section: League Name (Left) & Countdown Timer (Right) -->
   <div class="flex items-start justify-between w-full">
     <span class="text-[10px] font-black tracking-wider text-muted-foreground uppercase">
       {game.league}
@@ -52,21 +79,37 @@
       {:else}
         <div class="flex items-center gap-1 text-[11px] font-bold text-foreground">
           <Clock class="h-3 w-3 text-muted-foreground" />
-          <span>{formatGameTime(game.startTime)}</span>
+          <span>{remainingTime}</span>
         </div>
+        <span class="text-[9px] font-bold text-muted-foreground">{formattedDate}</span>
       {/if}
     </div>
   </div>
 
-  <!-- Middle: Team Names Stacked Vertically -->
-  <div class="space-y-1 my-2">
-    <div class="text-sm font-bold text-foreground">{game.homeTeam}</div>
-    <div class="text-sm font-bold text-foreground">{game.awayTeam}</div>
+  <!-- Middle Section: Team Names Stacked Vertically with Live scoreboards -->
+  <div class="space-y-2 my-1">
+    <!-- Home Team -->
+    <div class="flex items-center justify-between w-full">
+      <span class="text-sm font-bold text-foreground">{game.homeTeam}</span>
+      {#if isLive}
+        <!-- Displays active running home score dynamically -->
+        <span class="text-xs font-black text-primary px-1.5 py-0.5 rounded bg-muted/60 border border-border">{game.homeScore ?? 0}</span>
+      {/if}
+    </div>
+
+    <!-- Away Team -->
+    <div class="flex items-center justify-between w-full">
+      <span class="text-sm font-bold text-foreground">{game.awayTeam}</span>
+      {#if isLive}
+        <!-- Displays active running away score dynamically -->
+        <span class="text-xs font-black text-primary px-1.5 py-0.5 rounded bg-muted/60 border border-border">{game.awayScore ?? 0}</span>
+      {/if}
+    </div>
   </div>
 
-  <!-- Bottom: Odds Grid and Payout Links separated vertically to prevent horizontal squeezes -->
+  <!-- Bottom Section: Odds Grid and Payout Links separated vertically to prevent horizontal squeezes -->
   <div class="border-t border-border pt-4 mt-auto space-y-2.5">
-    <!-- 1. Row of 3 Odds Buttons (Full-Width 3-Column Grid) -->
+    <!-- Row of 3 Odds Buttons (Full-Width 3-Column Grid) -->
     <div class="grid grid-cols-3 gap-2">
       {#if sortedMarkets.length > 0}
         {#each sortedMarkets as market}
@@ -87,7 +130,7 @@
       {/if}
     </div>
 
-    <!-- 2. Clean, right-aligned link on its own line below the buttons -->
+    <!-- Clean, right-aligned link on its own line below the buttons -->
     <div class="flex justify-end px-0.5">
       <a 
         href="/sportsbook/match/{game.id}" 

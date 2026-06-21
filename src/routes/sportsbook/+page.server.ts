@@ -26,7 +26,7 @@ export const load: PageServerLoad = async ({ url }) => {
 
   // Query only games that are LIVE/UPCOMING and started less than 4 hours ago
   let query = `
-    SELECT id, sport, league, home_team as homeTeam, away_team as awayTeam, start_time as startTime, status
+    SELECT id, sport, league, home_team as homeTeam, away_team as awayTeam, start_time as startTime, status, home_score as homeScore, away_score as awayScore
     FROM admin_games
     WHERE status IN ('UPCOMING', 'LIVE')
       AND start_time >= DATE_SUB(NOW(), INTERVAL 4 HOUR)

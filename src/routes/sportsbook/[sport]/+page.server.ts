@@ -7,7 +7,6 @@ import type { RowDataPacket } from 'mysql2';
 // Maps dynamic URL slugs to MySQL wildcard search patterns
 const CATEGORY_MAP: Record<string, { pattern: string; title: string }> = {
   'football': { pattern: 'soccer_%', title: 'Football / Soccer' },
-  'soccer': { pattern: 'soccer_%', title: 'Football / Soccer' },
   'basketball': { pattern: 'basketball_%', title: 'Basketball' },
   'nba': { pattern: 'basketball_nba', title: 'NBA Basketball' },
   'euroleague': { pattern: 'basketball_euroleague', title: 'Euroleague Basketball' },
@@ -52,7 +51,7 @@ export const load: PageServerLoad = async ({ params }) => {
 
   // Query games using the MySQL LIKE operator (e.g. matching all sports starting with 'soccer_')
   const [games] = await db.execute<RowDataPacket[]>(
-    `SELECT id, sport, league, home_team as homeTeam, away_team as awayTeam, start_time as startTime, status
+    `SELECT id, sport, league, home_team as homeTeam, away_team as awayTeam, start_time as startTime, status, home_score as homeScore, away_score as awayScore
      FROM admin_games
      WHERE sport LIKE ? AND status IN ('UPCOMING', 'LIVE')
        AND start_time >= DATE_SUB(NOW(), INTERVAL 4 HOUR)
