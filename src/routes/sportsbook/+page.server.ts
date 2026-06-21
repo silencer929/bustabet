@@ -65,6 +65,8 @@ export const load: PageServerLoad = async ({ url }) => {
     awayTeam: game.awayTeam,
     startTime: new Date(game.startTime),
     status: game.status,
+    homeScore: game.homeScore !== null ? Number(game.homeScore) : null,
+    awayScore: game.awayScore !== null ? Number(game.awayScore) : null,
     markets: markets
       .filter((m) => m.gameId === game.id)
       .map((m) => ({
