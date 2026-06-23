@@ -4,45 +4,42 @@
   import { Input } from '$lib/components/ui/input';
   import { Badge } from '$lib/components/ui/badge';
   import { formatGameTime } from '$lib/utils/datetime';
-  import { ChevronLeft, Plus, ShieldAlert, Check, Power, PowerOff, Trash2, Calendar } from 'lucide-svelte';
+  import { ChevronLeft, Plus, ShieldAlert, Check, Power, PowerOff, Trash2, Calendar, LayoutGrid } from 'lucide-svelte';
   import type { GameWithMarkets } from '$lib/types/game';
 
   let { data, form } = $props<{
-    data: { game: GameWithMarkets };
+    data: { game: GameWithMarkets; vipTiers: any[] };
     form: { error?: string } | null;
   }>();
 
   let isSubmitting = $state(false);
+  
+  // State variable controlling the active creation template selection (Defaults to H2H)
+  let selectedTemplate = $state('h2h');
 
-  // Group market items dynamically based on their category keys
-  const h2hMarkets = $derived(data.game.markets.filter((m: any) => m.marketName === 'h2h'));
-  const doubleChanceMarkets = $derived(data.game.markets.filter((m: any) => m.marketName === 'double_chance'));
-  const drawNoBetMarkets = $derived(data.game.markets.filter((m: any) => m.marketName === 'draw_no_bet'));
-  const overUnderMarkets = $derived(data.game.markets.filter((m: any) => m.marketName === 'over_under'));
-
-  const getStatusClass = (status: string) => {
-    switch (status) {
-      case 'APPROVED': return 'bg-emerald-950/40 text-emerald-400 border-emerald-800/80';
-      case 'PENDING': return 'bg-amber-950/40 text-amber-400 border-amber-800/80';
-      default: return 'bg-red-950/40 text-red-400 border-red-800/80';
-    }
-  };
+  const h2hMarkets = $derived(data.game.markets.filter((m) => m.marketName === 'h2h'));
+  const doubleChanceMarkets = $derived(data.game.markets.filter((m) => m.marketName === 'double_chance'));
+  const drawNoBetMarkets = $derived(data.game.markets.filter((m) => m.marketName === 'draw_no_bet'));
+  const totalsMarkets = $derived(data.game.markets.filter((m) => m.marketName === 'totals' || m.marketName === 'over_under'));
+  const bttsMarkets = $derived(data.game.markets.filter((m) => m.marketName === 'btts'));
+  const csMarkets = $derived(data.game.markets.filter((m) => m.marketName === 'correct_score'));
+  const wtnMarkets = $derived(data.game.markets.filter((m) => m.marketName === 'win_to_nil'));
 </script>
 
 <div class="space-y-6">
-  <!-- Back navigation button -->
-  <a href="/admin/games" class="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground transition">
+  <!-- Back Button -->
+  <a href="/admin/games" class="inline-flex items-center gap-1.5 text-xs font-bold text-neutral-500 hover:text-white transition">
     <ChevronLeft class="h-4 w-4" />
     <span>Back to Fixtures</span>
   </a>
 
-  <!-- Scoreboard Header Display -->
-  <div class="rounded-2xl border border-border bg-background/40 p-6 text-center space-y-4">
+  <!-- Scoreboard Panel -->
+  <div class="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6 text-center space-y-4">
     <span class="text-[10px] font-black tracking-widest text-neutral-500 uppercase">{data.game.league}</span>
     <div class="flex items-center justify-between max-w-xl mx-auto">
-      <span class="text-sm font-black text-foreground">{data.game.homeTeam}</span>
-      <span class="text-xs font-black tracking-widest text-red-500 uppercase px-3 py-1 bg-background border border-border rounded-full">VS</span>
-      <span class="text-sm font-black text-foreground">{data.game.awayTeam}</span>
+      <span class="text-sm font-black text-neutral-200">{data.game.homeTeam}</span>
+      <span class="text-xs font-black tracking-widest text-red-500 uppercase px-3 py-1 bg-neutral-950 border border-neutral-800 rounded-full">VS</span>
+      <span class="text-sm font-black text-neutral-200">{data.game.awayTeam}</span>
     </div>
     <div class="text-[10px] font-bold text-neutral-500 flex items-center justify-center gap-1">
       <Calendar class="h-3.5 w-3.5" />
@@ -51,16 +48,34 @@
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- Form: Add Custom Market Option -->
-    <div class="rounded-xl border border-border bg-background/60 p-5 space-y-4 h-fit">
+    <!-- Template-Driven Add Market Container -->
+    <div class="rounded-xl border border-neutral-800 bg-neutral-900/60 p-5 space-y-4 h-fit">
       <div class="space-y-1">
-        <h3 class="text-xs font-black text-neutral-100 uppercase tracking-widest">Add Market Selection</h3>
-        <p class="text-xs text-neutral-500 font-semibold leading-relaxed">Add a single new outcome line (e.g. Over 2.5 goals or Draw No Bet outcomes) manually.</p>
+        <h3 class="text-xs font-black text-neutral-100 uppercase tracking-widest flex items-center gap-1.5">
+          <LayoutGrid class="h-4 w-4 text-red-500" />
+          <span>Market Templates</span>
+        </h3>
+        <p class="text-xs text-neutral-500 font-semibold leading-relaxed">Select a template to generate complete and mathematically correct markets atomically.</p>
       </div>
 
+      <!-- Template Selector dropdown -->
+      <div class="space-y-1">
+        <label for="templateSelector" class="text-xs font-bold text-neutral-500">Select Template Category</label>
+        <select id="templateSelector" bind:value={selectedTemplate} class="flex h-10 w-full rounded-md border border-neutral-800 bg-neutral-950 px-3 py-2 text-xs font-semibold text-neutral-200 focus:border-red-500 focus:outline-none">
+          <option value="h2h">1. H2H (3 Options)</option>
+          <option value="double_chance">2. Double Chance (3 Options)</option>
+          <option value="over_under">3. Over/Under Goals (2 Options)</option>
+          <option value="correct_score">4. Correct Score (1 Option)</option>
+          <option value="totals">5. Totals Market (2 Options)</option>
+          <option value="btts">6. Both Teams to Score (2 Options)</option>
+          <option value="win_to_nil">7. Win to Nil (2 Options)</option>
+        </select>
+      </div>
+
+      <!-- Dynamic Form rendered based on selectedTemplate -->
       <form 
         method="POST" 
-        action="?/addMarketOption"
+        action="?/addMarketTemplate"
         use:enhance={() => {
           isSubmitting = true;
           return async ({ update }) => {
@@ -68,7 +83,7 @@
             update();
           };
         }}
-        class="space-y-3"
+        class="space-y-4 border-t border-neutral-800 pt-3"
       >
         {#if form?.error}
           <div class="flex items-start gap-2 rounded-lg bg-red-950/40 border border-red-800/80 px-3 py-2 text-xs text-red-400 font-bold">
@@ -77,47 +92,137 @@
           </div>
         {/if}
 
-        <!-- Market Type Selection -->
-        <div class="space-y-1">
-          <label for="marketName" class="text-xs font-bold text-neutral-500">Market Category</label>
-          <select id="marketName" name="marketName" required class="flex h-9 w-full rounded-md border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground focus:border-red-500 focus:outline-none">
-            <option value="h2h">Match Result (h2h)</option>
-            <option value="double_chance">Double Chance</option>
-            <option value="draw_no_bet">Draw No Bet</option>
-            <option value="over_under">Over / Under Goals</option>
-          </select>
-        </div>
+        <input type="hidden" name="templateType" value={selectedTemplate} />
 
-        <!-- Selection Name -->
-        <div class="space-y-1">
-          <label for="selection" class="text-xs font-bold text-neutral-500">Outcome Label</label>
-          <Input id="selection" name="selection" type="text" required placeholder="1X or Over 2.5" class="bg-background border-border focus:border-red-500 text-xs h-9 font-bold text-foreground" />
-        </div>
+        <!-- Render H2H Form -->
+        {#if selectedTemplate === 'h2h'}
+          <div class="space-y-2.5">
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold text-neutral-500 uppercase">{data.game.homeTeam} Win Odds</span>
+              <Input type="number" step="0.01" name="homeOdds" required placeholder="1.85" class="h-9 bg-neutral-950 border-neutral-800 focus:border-red-500 text-xs font-bold" />
+            </div>
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold text-neutral-500 uppercase">Draw Odds</span>
+              <Input type="number" step="0.01" name="drawOdds" required placeholder="3.40" class="h-9 bg-neutral-950 border-neutral-800 focus:border-red-500 text-xs font-bold" />
+            </div>
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold text-neutral-500 uppercase">{data.game.awayTeam} Win Odds</span>
+              <Input type="number" step="0.01" name="awayOdds" required placeholder="2.90" class="h-9 bg-neutral-950 border-neutral-800 focus:border-red-500 text-xs font-bold" />
+            </div>
+          </div>
+        {/if}
 
-        <!-- Odds decimal value -->
-        <div class="space-y-1">
-          <label for="odds" class="text-xs font-bold text-neutral-500">Decimal Price</label>
-          <Input id="odds" name="odds" type="number" step="0.01" required placeholder="2.40" class="bg-background border-border focus:border-red-500 text-xs h-9 font-bold text-foreground" />
-        </div>
+        <!-- Render Double Chance Form -->
+        {#if selectedTemplate === 'double_chance'}
+          <div class="space-y-2.5">
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold text-neutral-500 uppercase">1X (Home/Draw) Odds</span>
+              <Input type="number" step="0.01" name="hdOdds" required placeholder="1.23" class="h-9 bg-neutral-950 border-neutral-800 focus:border-red-500 text-xs font-bold" />
+            </div>
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold text-neutral-500 uppercase">X2 (Draw/Away) Odds</span>
+              <Input type="number" step="0.01" name="daOdds" required placeholder="2.15" class="h-9 bg-neutral-950 border-neutral-800 focus:border-red-500 text-xs font-bold" />
+            </div>
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold text-neutral-500 uppercase">12 (Home/Away) Odds</span>
+              <Input type="number" step="0.01" name="haOdds" required placeholder="1.16" class="h-9 bg-neutral-950 border-neutral-800 focus:border-red-500 text-xs font-bold" />
+            </div>
+          </div>
+        {/if}
+
+        <!-- Render Over/Under or Totals Form -->
+        {#if selectedTemplate === 'over_under' || selectedTemplate === 'totals'}
+          <div class="space-y-2.5">
+            <div class="space-y-1">
+              <label for="point" class="text-xs font-bold text-neutral-500">Goal Line Point</label>
+              <select id="point" name="point" required class="flex h-9 w-full rounded-md border border-neutral-800 bg-neutral-950 px-3 py-1.5 text-xs font-semibold text-neutral-200 focus:border-red-500 focus:outline-none">
+                <option value="0.5">0.5</option>
+                <option value="1.5">1.5</option>
+                <option value="2.5">2.5</option>
+                <option value="3.5">3.5</option>
+                <option value="4.5">4.5</option>
+              </select>
+            </div>
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold text-neutral-500 uppercase">Over Odds</span>
+              <Input type="number" step="0.01" name="overOdds" required placeholder="1.90" class="h-9 bg-neutral-950 border-neutral-800 focus:border-red-500 text-xs font-bold" />
+            </div>
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold text-neutral-500 uppercase">Under Odds</span>
+              <Input type="number" step="0.01" name="underOdds" required placeholder="1.90" class="h-9 bg-neutral-950 border-neutral-800 focus:border-red-500 text-xs font-bold" />
+            </div>
+          </div>
+        {/if}
+
+        <!-- Render Correct Score Form -->
+        {#if selectedTemplate === 'correct_score'}
+          <div class="space-y-2.5">
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold text-neutral-500 uppercase">Predict Scoreline</span>
+              <Input type="text" name="scoreLine" required placeholder="2 - 1" class="h-9 bg-neutral-950 border-neutral-800 focus:border-red-500 text-xs font-bold" />
+            </div>
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold text-neutral-500 uppercase">Odds</span>
+              <Input type="number" step="0.01" name="odds" required placeholder="9.50" class="h-9 bg-neutral-950 border-neutral-800 focus:border-red-500 text-xs font-bold" />
+            </div>
+          </div>
+        {/if}
+
+        <!-- Render Both Teams to Score (BTTS) Form -->
+        {#if selectedTemplate === 'btts'}
+          <div class="space-y-2.5">
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold text-neutral-500 uppercase">Yes Odds</span>
+              <Input type="number" step="0.01" name="yesOdds" required placeholder="1.80" class="h-9 bg-neutral-950 border-neutral-800 focus:border-red-500 text-xs font-bold" />
+            </div>
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold text-neutral-500 uppercase">No Odds</span>
+              <Input type="number" step="0.01" name="noOdds" required placeholder="1.95" class="h-9 bg-neutral-950 border-neutral-800 focus:border-red-500 text-xs font-bold" />
+            </div>
+          </div>
+        {/if}
+
+        <!-- Render Win to Nil Form -->
+        {#if selectedTemplate === 'win_to_nil'}
+          <div class="space-y-2.5">
+            <div class="space-y-1">
+              <label for="team" class="text-xs font-bold text-neutral-500">Target Team</label>
+              <select id="team" name="team" required class="flex h-9 w-full rounded-md border border-neutral-800 bg-neutral-950 px-3 py-1.5 text-xs font-semibold text-neutral-200 focus:border-red-500 focus:outline-none">
+                <option value="HOME">Home Team ({data.game.homeTeam})</option>
+                <option value="AWAY">Away Team ({data.game.awayTeam})</option>
+              </select>
+            </div>
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold text-neutral-500 uppercase">Yes (Win to Nil) Odds</span>
+              <Input type="number" step="0.01" name="yesOdds" required placeholder="2.60" class="h-9 bg-neutral-950 border-neutral-800 focus:border-red-500 text-xs font-bold" />
+            </div>
+            <div class="space-y-1">
+              <span class="text-[10px] font-bold text-neutral-500 uppercase">No (Win to Nil) Odds</span>
+              <Input id="odds" name="odds" type="number" step="0.01" required placeholder="1.45" class="bg-neutral-950 border-neutral-800 focus:border-red-500 text-xs h-9 font-bold text-neutral-200" />
+            </div>
+          </div>
+        {/if}
 
         <Button 
           type="submit" 
           disabled={isSubmitting}
-          class="w-full h-10 bg-red-600 hover:bg-red-500 text-foreground font-black rounded-lg text-xs"
+          class="w-full h-10 bg-red-600 hover:bg-red-500 text-white font-black rounded-lg text-xs cursor-pointer"
         >
-          Add Selection Line
+          {isSubmitting ? 'Generating Line...' : 'Write Template to DB'}
         </Button>
       </form>
     </div>
 
-    <!-- Active Markets Management List -->
+    <!-- Active Markets Management List (Excludes the redundant single-item add form) -->
     <div class="lg:col-span-2 space-y-4">
-      <!-- Helper loop to render list groups -->
       {#each [
         { title: 'Match Result (h2h)', items: h2hMarkets },
         { title: 'Double Chance', items: doubleChanceMarkets },
         { title: 'Draw No Bet', items: drawNoBetMarkets },
-        { title: 'Over / Under Goals', items: overUnderMarkets }
+        { title: 'Totals / Over-Under Goals', items: totalsMarkets },
+        { title: 'Both Teams to Score (BTTS)', items: bttsMarkets },
+        { title: 'Correct Scores', items: csMarkets },
+        { title: 'Win to Nil', items: wtnMarkets }
       ] as group}
         {#if group.items.length > 0}
           <div class="space-y-2">
@@ -125,12 +230,12 @@
             
             <div class="space-y-2">
               {#each group.items as market}
-                <div class="flex items-center justify-between border border-border bg-background/40 p-3 rounded-xl gap-4
-                  {market.active ? 'border-border' : 'border-red-900/20 opacity-60'}"
+                <div class="flex items-center justify-between border border-neutral-800 bg-neutral-900/40 p-3 rounded-xl gap-4
+                  {market.active ? 'border-neutral-800' : 'border-red-900/20 opacity-60'}"
                 >
                   <div class="flex items-center gap-3">
                     <div>
-                      <div class="text-xs font-bold text-foreground">{market.selection}</div>
+                      <div class="text-xs font-bold text-neutral-200">{market.selection}</div>
                       <span class="text-[9px] font-black text-neutral-500 uppercase tracking-widest">ID: {market.id}</span>
                     </div>
                   </div>
@@ -157,13 +262,13 @@
                         name="odds" 
                         value={market.odds} 
                         disabled={isSubmitting}
-                        class="h-8 border-border bg-background text-foreground text-xs font-bold px-2 w-20"
+                        class="h-8 border-neutral-800 bg-neutral-950 text-neutral-200 text-xs font-bold px-2 w-20"
                       />
                       <Button 
                         type="submit" 
                         disabled={isSubmitting}
                         size="icon"
-                        class="h-8 w-8 bg-red-600 hover:bg-red-500 text-foreground rounded"
+                        class="h-8 w-8 bg-red-600 hover:bg-red-500 text-white rounded"
                         title="Update Odds"
                       >
                         <Check class="h-3.5 w-3.5" />
@@ -189,7 +294,7 @@
                         disabled={isSubmitting}
                         size="icon"
                         variant="outline"
-                        class="h-8 w-8 border-border bg-background text-muted-foreground hover:text-foreground rounded"
+                        class="h-8 w-8 border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-white rounded"
                         title={market.active ? 'Suspend Market' : 'Activate Market'}
                       >
                         {#if market.active}
@@ -218,7 +323,7 @@
                         disabled={isSubmitting}
                         size="icon"
                         variant="outline"
-                        class="h-8 w-8 border-border bg-background text-neutral-500 hover:text-red-400 rounded"
+                        class="h-8 w-8 border-neutral-800 bg-neutral-900 text-neutral-500 hover:text-red-400 rounded"
                         title="Delete Selection Line"
                       >
                         <Trash2 class="h-3.5 w-3.5" />
