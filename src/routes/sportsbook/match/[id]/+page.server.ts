@@ -25,7 +25,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
   try {
     // 2. Perform a Deep Harvest sync for this specific game (Protected by a 30-min cache lock)
-    await OddsSyncService.syncEventOddsDeep(baseGame.sport, params.id);
+    // await OddsSyncService.syncEventOddsDeep(baseGame.sport, params.id);
   } catch (syncError) {
     // Catch individual sync failures to allow players to read existing cached odds offline
     console.error('[On-Demand Deep Sync Error]:', syncError);

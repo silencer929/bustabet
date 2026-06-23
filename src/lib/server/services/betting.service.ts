@@ -2,9 +2,9 @@ import { db } from '../db';
 import { WalletService } from './wallet.service';
 import { calculatePotentialWin } from '$lib/utils/odds';
 import type { RowDataPacket } from 'mysql2';
-
+import {env} from '$env/dynamic/private';
 export class BettingService {
-  private static MINIMUM_STAKE = 10.00; // Minimum allowed wager value
+  private static MINIMUM_STAKE = Number(env.MINIMUM_STAKE_AMOUNT || 10.00);
 
   // Atomically validates and places a new bet slip wager using SQL transactions
   static async placeBet(profileId: string, marketId: string, stake: number): Promise<{ success: boolean; message: string; betId?: string }> {
@@ -48,7 +48,7 @@ export class BettingService {
       const kickoffTime = new Date(market.start_time);
 
       // Block bet placement if the match is already live or completed
-      if (market.status !== 'UPCOMING' || new Date() >= kickoffTime) {
+      if (market.status !== 'UPCOMING' || market.status === 'COMPLETED'){
         await conn.rollback();
         return { success: false, message: 'This game has already started' };
       }

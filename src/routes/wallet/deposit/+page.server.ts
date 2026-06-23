@@ -1,13 +1,17 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { WalletService } from '$lib/server/services/wallet.service';
-import { paymentSchema } from '$lib/utils/validation';
 
 export const load: PageServerLoad = async ({ locals }) => {
   // Guard the route; redirect unauthenticated users to login
   if (!locals.user) {
     throw redirect(303, '/auth/login');
   }
+
+  // Pass down the dynamic, environment-controlled minimum deposit threshold to the client page
+  return {
+    minDeposit: WalletService.MINIMUM_DEPOSIT
+  };
 };
 
 export const actions: Actions = {
@@ -26,8 +30,15 @@ export const actions: Actions = {
       return fail(400, { error: 'Please enter a valid deposit amount' });
     }
 
+    // Enforce the dynamic, environment-controlled minimum deposit constraint
+    if (amount < WalletService.MINIMUM_DEPOSIT) {
+      return fail(400, { 
+        error: `The minimum deposit amount on our platform is ${WalletService.MINIMUM_DEPOSIT}` 
+      });
+    }
+
     if (!phone || !phone.match(/^\+?[1-9]\d{1,14}$/)) {
-      return fail(400, { error: 'Invalid phone format. Please enter in international format (+254...)' });
+      return fail(400, { error: 'Please enter a valid phone number in international format (+254...)' });
     }
 
     try {

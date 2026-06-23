@@ -3,6 +3,9 @@ import { env } from '$env/dynamic/private';
 import type { RowDataPacket } from 'mysql2';
 
 export class WalletService {
+  // Dynamically parses the private environment limit, defaulting to 200.00 if undefined
+  public static readonly MINIMUM_DEPOSIT = Number(env.MIN_DEPOSIT_AMOUNT || 200.00);
+
   // Computes active user balance: Deposits + Payouts - Completed/Pending Withdrawals - Pending Bets
   static async getBalance(profileId: string): Promise<number> {
     // Aggregate transactions by type and status
@@ -45,6 +48,11 @@ export class WalletService {
 
   // Initiates an M-Pesa STK Push deposit using the PayHero gateway API
   static async initiateMpesaDeposit(profileId: string, amount: number, phoneNumber: string): Promise<{ success: boolean; message: string; reference: string }> {
+    // Enforce dynamic environment-level minimum deposit boundary check
+    if (amount < this.MINIMUM_DEPOSIT) {
+      throw new Error(`The minimum allowed deposit is ${this.MINIMUM_DEPOSIT}`);
+    }
+
     const [profiles] = await db.execute<RowDataPacket[]>(
       'SELECT currency, full_name, username FROM profiles WHERE id = ? LIMIT 1',
       [profileId]

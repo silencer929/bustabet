@@ -4,7 +4,7 @@
   import { formatCurrency } from '$lib/utils/currency';
   import { Button } from '$lib/components/ui/button';
   import { Input } from '$lib/components/ui/input';
-  import { ShieldAlert, ArrowUpRight, CheckCircle2, Loader2 } from 'lucide-svelte';
+  import { ShieldAlert, ArrowUpRight, CircleCheck, LoaderCircle } from 'lucide-svelte';
 
   // Svelte 5 layout properties capturing load balance data and action results
   let { data, form } = $props<{
@@ -41,7 +41,7 @@
         <!-- Success State: Request logged -->
         <div class="rounded-lg bg-green-950/40 border border-green-800/80 p-4 text-center space-y-3">
           <div class="flex justify-center">
-            <CheckCircle2 class="h-8 w-8 text-green-500 animate-bounce" />
+            <CircleCheck class="h-8 w-8 text-green-500 animate-bounce" />
           </div>
           <p class="text-xs text-green-400 font-bold leading-relaxed">{form.message}</p>
           <div class="pt-2">
@@ -123,7 +123,7 @@
           >
             {#if isSubmitting}
               <div class="flex items-center justify-center gap-2">
-                <Loader2 class="h-4 w-4 animate-spin" />
+                <LoaderCircle class="h-4 w-4 animate-spin" />
                 Requesting payout...
               </div>
             {:else}

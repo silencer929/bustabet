@@ -1,13 +1,18 @@
 import type { LayoutServerLoad } from './$types';
 import { WalletService } from '$lib/server/services/wallet.service';
 import { db } from '$lib/server/db';
+import { MINIMUM_STAKE_AMOUNT } from '$env/static/private'; // Import your new environment variable
 import type { RowDataPacket } from 'mysql2';
 
 export const load: LayoutServerLoad = async ({ locals }) => {
+  const minDeposit = WalletService.MINIMUM_DEPOSIT;
+  
+  // Parse the minimum stake limit, defaulting to 10.00 if undefined
+  const minStake = Number(MINIMUM_STAKE_AMOUNT || 10.00);
+
   if (locals.user) {
     const balance = await WalletService.getBalance(locals.user.id);
 
-    // Query unread player notifications using standard SQL queries
     const [notifications] = await db.execute<RowDataPacket[]>(
       `SELECT id, profile_id as profileId, title, message, \`read\`, created_at as createdAt
        FROM notifications 
@@ -26,13 +31,17 @@ export const load: LayoutServerLoad = async ({ locals }) => {
         message: n.message,
         read: Boolean(n.read),
         createdAt: new Date(n.createdAt)
-      }))
+      })),
+      minDeposit,
+      minStake // Return globally to all pages
     };
   }
 
   return {
     user: null,
     balance: 0,
-    notifications: []
+    notifications: [],
+    minDeposit,
+    minStake // Return globally to all pages
   };
 };

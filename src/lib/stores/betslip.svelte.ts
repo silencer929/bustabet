@@ -10,21 +10,21 @@ class BetSlipStore {
   // Computes the total count of active selections
   count = $derived(this.selections.length);
 
-  // Computes overall accumulative parlay odds (multiplying nested selection odds)
+  // CORRECTED: Computes overall odds by SUMMING (adding) the active odds together (e.g., 4.29 + 3.30 + 4.91 = 12.50)
   totalOdds = $derived(
     this.selections.length > 0
-      ? Number(this.selections.reduce((acc, curr) => acc * curr.odds, 1).toFixed(2))
+      ? Number(this.selections.reduce((acc, curr) => acc + curr.odds, 0).toFixed(2))
       : 0
   );
 
-  // Computes the potential win payout based on the active stake and overall odds
+  // Computes the potential win payout based on the summed overall odds multiplied by the stake
   potentialWin = $derived(
     this.selections.length > 0 && this.stake > 0
       ? Number((this.stake * this.totalOdds).toFixed(2))
       : 0
   );
 
-  // Adds a selection, enforcing that only one option is chosen per market category (marketName) per game
+  // Adds a selection, replacing only existing selections for the identical market on the same game
   addSelection(selection: BetSlipSelection) {
     const filtered = this.selections.filter(
       (s) => !(s.gameId === selection.gameId && s.marketName === selection.marketName)
