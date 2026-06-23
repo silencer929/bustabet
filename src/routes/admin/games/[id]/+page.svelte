@@ -17,13 +17,13 @@
   // State variable controlling the active creation template selection (Defaults to H2H)
   let selectedTemplate = $state('h2h');
 
-  const h2hMarkets = $derived(data.game.markets.filter((m) => m.marketName === 'h2h'));
-  const doubleChanceMarkets = $derived(data.game.markets.filter((m) => m.marketName === 'double_chance'));
-  const drawNoBetMarkets = $derived(data.game.markets.filter((m) => m.marketName === 'draw_no_bet'));
-  const totalsMarkets = $derived(data.game.markets.filter((m) => m.marketName === 'totals' || m.marketName === 'over_under'));
-  const bttsMarkets = $derived(data.game.markets.filter((m) => m.marketName === 'btts'));
-  const csMarkets = $derived(data.game.markets.filter((m) => m.marketName === 'correct_score'));
-  const wtnMarkets = $derived(data.game.markets.filter((m) => m.marketName === 'win_to_nil'));
+  const h2hMarkets = $derived(data.game.markets.filter((m: { marketName: string }) => m.marketName === 'h2h'));
+  const doubleChanceMarkets = $derived(data.game.markets.filter((m: { marketName: string }) => m.marketName === 'double_chance'));
+  const drawNoBetMarkets = $derived(data.game.markets.filter((m: { marketName: string }) => m.marketName === 'draw_no_bet'));
+  const totalsMarkets = $derived(data.game.markets.filter((m: { marketName: string }) => m.marketName === 'totals' || m.marketName === 'over_under'));
+  const bttsMarkets = $derived(data.game.markets.filter((m: { marketName: string }) => m.marketName === 'btts'));
+  const csMarkets = $derived(data.game.markets.filter((m: { marketName: string }) => m.marketName === 'correct_score'));
+  const wtnMarkets = $derived(data.game.markets.filter((m: { marketName: string }) => m.marketName === 'win_to_nil'));
 </script>
 
 <div class="space-y-6">
