@@ -7,9 +7,9 @@ import type { RowDataPacket } from 'mysql2';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
   // Guard the route; redirect unauthenticated users to login
-  if (!locals.user) {
-    throw redirect(303, '/auth/login');
-  }
+  // if (!locals.user) {
+  //   throw redirect(303, '/auth/login');
+  // }
 
   // 1. Retrieve the base match metadata to identify the sport key using SQL
   const [games] = await db.execute<RowDataPacket[]>(
