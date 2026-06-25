@@ -20,7 +20,7 @@
 
   // Client-side dynamic search and status filtering array
   const filteredGames = $derived(
-    data.games.filter((game) => {
+    data.games.filter((game: any) => {
       const matchesSearch = 
         game.homeTeam.toLowerCase().includes(searchQuery.toLowerCase()) ||
         game.awayTeam.toLowerCase().includes(searchQuery.toLowerCase()) ||
