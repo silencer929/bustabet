@@ -42,7 +42,6 @@
           <!-- Bet Metadata Row -->
           <div class="flex justify-between items-center border-b border-border/60 pb-3">
             <div class="flex items-center gap-2">
-              <!-- Render different icons depending on SINGLE vs COMBO wagers -->
               {#if bet.type === 'COMBO'}
                 <Layers class="h-4 w-4 text-primary shrink-0" />
                 <span class="text-xs font-black text-neutral-200">COMBO / MULTIBET</span>
@@ -62,20 +61,40 @@
           <!-- Bet Selections details -->
           <div class="space-y-2">
             {#if bet.type === 'COMBO'}
-              <!-- For Combo: Iterate over the safe-parsed selections -->
+              <!-- For Combo -->
               <div class="space-y-2">
                 {#each bet.selections as selection}
+                  {@const showScore = selection.gameStatus === 'LIVE' || selection.gameStatus === 'COMPLETED'}
                   <div class="pl-3 border-l-2 border-primary/40 space-y-0.5">
-                    <div class="text-xs font-bold text-neutral-300">{selection.selection}</div>
-                    <div class="text-[9px] text-neutral-500 font-semibold">{selection.homeTeam} vs {selection.awayTeam} &bull; Odds: {selection.odds.toFixed(2)}</div>
+                    <div class="text-xs font-bold text-neutral-300 flex items-center justify-between">
+                      <span>{selection.selection}</span>
+                      {#if showScore}
+                        <!-- Display current running score or final score -->
+                        <span class="text-[10px] font-black text-primary px-1.5 py-0 bg-muted/60 border border-border rounded">
+                          {selection.homeScore} - {selection.awayScore}
+                        </span>
+                      {/if}
+                    </div>
+                    <div class="text-[9px] text-neutral-500 font-semibold">{selection.homeTeam} vs {selection.awayTeam} &bull; Odds: {selection.odds?.toFixed(2) || '0.00'}</div>
                   </div>
                 {/each}
               </div>
             {:else}
-              <!-- For Single: Display the single fixture information -->
+              <!-- For Single -->
+              {@const showScore = bet.game?.gameStatus === 'LIVE' || bet.game?.gameStatus === 'COMPLETED'}
               <div class="pl-3 border-l-2 border-primary/40 space-y-0.5">
-                <div class="text-xs font-bold text-neutral-300">{bet.market.selection}</div>
-                <div class="text-[9px] text-neutral-500 font-semibold">{bet.game.homeTeam} vs {bet.game.awayTeam} &bull; Odds: {bet.odds.toFixed(2)}</div>
+                <div class="text-xs font-bold text-neutral-300 flex items-center justify-between">
+                  <span>{bet.market?.selection || 'Unknown Selection'}</span>
+                  {#if showScore}
+                    <!-- Display current running score or final score -->
+                    <span class="text-[10px] font-black text-primary px-1.5 py-0 bg-muted/60 border border-border rounded">
+                      {bet.game.homeScore} - {bet.game.awayScore}
+                    </span>
+                  {/if}
+                </div>
+                <div class="text-[9px] text-neutral-500 font-semibold">
+                  {bet.game?.homeTeam || 'Unknown Team'} vs {bet.game?.awayTeam || 'Unknown Team'} &bull; Odds: {bet.odds?.toFixed(2) || '0.00'}
+                </div>
               </div>
             {/if}
           </div>
@@ -84,7 +103,7 @@
           <div class="border-t border-border/60 pt-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs font-bold text-neutral-400">
             <div class="flex gap-4">
               <span>Stake: <span class="text-foreground">{formatCurrency(bet.stake, auth.user?.currency || 'USD')}</span></span>
-              <span>Total Odds: <span class="text-primary">{bet.odds.toFixed(2)}</span></span>
+              <span>Total Odds: <span class="text-primary">{bet.odds?.toFixed(2) || '0.00'}</span></span>
             </div>
             <div>
               <span>Potential Payout: <span class="text-emerald-500 font-black text-sm">{formatCurrency(bet.potentialWin, auth.user?.currency || 'USD')}</span></span>

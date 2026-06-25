@@ -3,7 +3,6 @@ import type { PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
 import type { RowDataPacket } from 'mysql2';
 
-// Safe JSON parser to handle both local (Parsed Object) and deployed (Raw String) environments
 function safeParseSelections(selectionsField: any): any[] {
   if (!selectionsField) return [];
   if (typeof selectionsField === 'object' && selectionsField !== null) {
@@ -22,10 +21,10 @@ export const load: PageServerLoad = async ({ locals }) => {
     throw redirect(303, '/auth/login');
   }
 
-  // Changed to LEFT JOIN so that both Single and COMBO bets (where game_id/market_id are NULL) are returned
+  // Corrected: Selecting home_score, away_score, and status for single bets
   const [rows] = await db.execute<RowDataPacket[]>(
-    `SELECT b.id, b.stake, b.odds, b.potential_win as potentialWin, b.status, b.created_at as createdAt, b.type, b.selections,
-            g.home_team as homeTeam, g.away_team as awayTeam,
+    `SELECT b.id, b.profile_id, b.game_id as gameId, b.market_id as marketId, b.stake, b.odds, b.potential_win as potentialWin, b.status, b.created_at as createdAt, b.type, b.selections,
+            g.home_team as homeTeam, g.away_team as awayTeam, g.status as gameStatus, g.home_score as homeScore, g.away_score as awayScore,
             m.selection as marketSelection, m.market_name as marketName
      FROM bets b
      LEFT JOIN admin_games g ON b.game_id = g.id
@@ -35,10 +34,46 @@ export const load: PageServerLoad = async ({ locals }) => {
     [locals.user.id]
   );
 
-  const serializedBets = rows.map((b) => {
-    const betType = b.type || 'SINGLE';
+  const serializedBets = [];
 
-    return {
+  for (const b of rows) {
+    const betType = b.type || 'SINGLE';
+    let selectionsList: any[] = [];
+
+    if (betType === 'COMBO' && b.selections) {
+      const parsed = safeParseSelections(b.selections);
+      const marketIds = parsed.map((p) => p.marketId);
+
+      if (marketIds.length > 0) {
+        const placeholders = marketIds.map(() => '?').join(',');
+
+        // Corrected: Selecting home_score, away_score, and status during the dynamic lookup
+        const [details] = await db.execute<RowDataPacket[]>(
+          `SELECT m.id as marketId, m.selection,
+                  g.home_team as homeTeam, g.away_team as awayTeam, g.status as gameStatus, g.home_score as homeScore, g.away_score as awayScore
+           FROM admin_game_markets m
+           INNER JOIN admin_games g ON m.game_id = g.id
+           WHERE m.id IN (${placeholders})`,
+          marketIds
+        );
+
+        selectionsList = parsed.map((p) => {
+          const matchDetail = details.find((d) => d.marketId === p.marketId);
+          return {
+            marketId: p.marketId,
+            odds: p.odds,
+            selection: matchDetail ? matchDetail.selection : 'Unknown Selection',
+            homeTeam: matchDetail ? matchDetail.homeTeam : 'Unknown Team',
+            awayTeam: matchDetail ? matchDetail.awayTeam : 'Unknown Team',
+            gameStatus: matchDetail ? matchDetail.gameStatus : 'UPCOMING',
+            homeScore: matchDetail ? matchDetail.homeScore : 0,
+            awayScore: matchDetail ? matchDetail.awayScore : 0
+          };
+        });
+      }
+    }
+
+    serializedBets.push({
       id: b.id,
       stake: Number(b.stake),
       odds: Number(b.odds),
@@ -46,13 +81,17 @@ export const load: PageServerLoad = async ({ locals }) => {
       status: b.status,
       type: betType,
       createdAt: new Date(b.createdAt),
-      // If it is a single bet, map standard fields; otherwise return null
-      game: b.game_id ? { homeTeam: b.homeTeam, awayTeam: b.awayTeam } : null,
-      market: b.market_id ? { selection: b.marketSelection, marketName: b.marketName } : null,
-      // Safely parse the selections JSON for Combo bets across dev and production environments
-      selections: betType === 'COMBO' ? safeParseSelections(b.selections) : []
-    };
-  });
+      game: b.gameId ? { 
+        homeTeam: b.homeTeam, 
+        awayTeam: b.awayTeam,
+        gameStatus: b.gameStatus,
+        homeScore: b.homeScore,
+        awayScore: b.awayScore
+      } : null,
+      market: b.marketId ? { selection: b.marketSelection, marketName: b.marketName } : null,
+      selections: selectionsList
+    });
+  }
 
   return {
     bets: serializedBets
