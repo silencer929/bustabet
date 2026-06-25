@@ -1,6 +1,7 @@
 import { redirect, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { db } from '$lib/server/db';
+import type { RowDataPacket } from 'mysql2';
 import { NotificationService } from '$lib/server/services/notification.service';
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -9,10 +10,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     throw redirect(303, '/auth/login');
   }
 
-  const notifications = await db.notification.findMany({
-    where: { profileId: locals.user.id },
-    orderBy: { createdAt: 'desc' }
-  });
+  const notifications = await NotificationService.getUnreadNotifications(locals.user.id);
 
   return { notifications };
 };
@@ -40,10 +38,7 @@ export const actions: Actions = {
     if (!locals.user) return fail(401);
 
     try {
-      await db.notification.updateMany({
-        where: { profileId: locals.user.id, read: false },
-        data: { read: true }
-      });
+      await NotificationService.markAsRead(locals.user.id);
       return { success: true };
     } catch (error: any) {
       return fail(500, { error: error.message });

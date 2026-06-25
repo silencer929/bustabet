@@ -10,50 +10,51 @@ return {
 	assets: new Set(["icons/android-chrome-512x512.png","icons/apple-touch-icon.png","icons/favicon-16x16.png","icons/favicon-32x32.png","icons/favicon.ico","logos/logo.png","robots.txt"]),
 	mimeTypes: {".png":"image/png",".txt":"text/plain"},
 	_: {
-		client: {start:"_app/immutable/entry/start.CYnTxW6x.js",app:"_app/immutable/entry/app.B97mFn7N.js",imports:["_app/immutable/entry/start.CYnTxW6x.js","_app/immutable/chunks/C-Z3mU-d.js","_app/immutable/chunks/ByXn1zri.js","_app/immutable/entry/app.B97mFn7N.js","_app/immutable/chunks/ByXn1zri.js","_app/immutable/chunks/kNaey6uv.js","_app/immutable/chunks/xihTtKlq.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:false},
+		client: {start:"_app/immutable/entry/start.gFLKKJbn.js",app:"_app/immutable/entry/app.0R4-lxyb.js",imports:["_app/immutable/entry/start.gFLKKJbn.js","_app/immutable/chunks/Crdp9ooN.js","_app/immutable/chunks/ByXn1zri.js","_app/immutable/entry/app.0R4-lxyb.js","_app/immutable/chunks/ByXn1zri.js","_app/immutable/chunks/kNaey6uv.js","_app/immutable/chunks/xihTtKlq.js"],stylesheets:[],fonts:[],uses_env_dynamic_public:false},
 		nodes: [
-			__memo(() => import('./chunks/0-B6OpcZR5.js')),
-			__memo(() => import('./chunks/1-F0VTK2jy.js')),
-			__memo(() => import('./chunks/2-ZVqKuQoR.js')),
+			__memo(() => import('./chunks/0-BXAuMZya.js')),
+			__memo(() => import('./chunks/1-9FPEpWNn.js')),
+			__memo(() => import('./chunks/2-Dpfjn27U.js')),
 			__memo(() => import('./chunks/3-CH3BHKyB.js')),
-			__memo(() => import('./chunks/4-BlAtFw9V.js')),
+			__memo(() => import('./chunks/4-DbmQexwr.js')),
 			__memo(() => import('./chunks/5-CfsH47tm.js')),
-			__memo(() => import('./chunks/6-JHmvPFUi.js')),
-			__memo(() => import('./chunks/7-v1yrJ2jE.js')),
-			__memo(() => import('./chunks/8-BrcVvgFD.js')),
+			__memo(() => import('./chunks/6-6x9qMr5z.js')),
+			__memo(() => import('./chunks/7-MfvG6SPf.js')),
+			__memo(() => import('./chunks/8-BLBansuA.js')),
 			__memo(() => import('./chunks/9-CDMoZBwG.js')),
 			__memo(() => import('./chunks/10-CBFhgcsK.js')),
 			__memo(() => import('./chunks/11-Dk7rBx6k.js')),
-			__memo(() => import('./chunks/12-DF_fRZJw.js')),
-			__memo(() => import('./chunks/13-CynCv9Yf.js')),
+			__memo(() => import('./chunks/12-Bhpx4Q8_.js')),
+			__memo(() => import('./chunks/13-CwtvW-st.js')),
 			__memo(() => import('./chunks/14-De75inB7.js')),
-			__memo(() => import('./chunks/15-fT1iSa4F.js')),
-			__memo(() => import('./chunks/16-CQj4tq9J.js')),
+			__memo(() => import('./chunks/15-KbBHforT.js')),
+			__memo(() => import('./chunks/16-C5Th5OND.js')),
 			__memo(() => import('./chunks/17-GIwr0Kkq.js')),
 			__memo(() => import('./chunks/18-rLWgoz7i.js')),
-			__memo(() => import('./chunks/19-Di1ptOk7.js')),
-			__memo(() => import('./chunks/20-Dw5z2yeE.js')),
+			__memo(() => import('./chunks/19-BMff4HKg.js')),
+			__memo(() => import('./chunks/20-YbUUXMCi.js')),
 			__memo(() => import('./chunks/21-DNTXSPVO.js')),
-			__memo(() => import('./chunks/22-CRDfXHFR.js')),
-			__memo(() => import('./chunks/23-C1TZNaqs.js')),
-			__memo(() => import('./chunks/24-D4zawqX_.js')),
-			__memo(() => import('./chunks/25-CC_BUXf5.js')),
-			__memo(() => import('./chunks/26-BWMZxWtK.js')),
-			__memo(() => import('./chunks/27-D8AVLo5i.js')),
-			__memo(() => import('./chunks/28-DMz5WR7Y.js')),
-			__memo(() => import('./chunks/29-BqD1uszJ.js')),
-			__memo(() => import('./chunks/30-D_pVtJgC.js')),
-			__memo(() => import('./chunks/31-4G8pxKST.js')),
-			__memo(() => import('./chunks/32-DPzxORga.js')),
-			__memo(() => import('./chunks/33-Ckw1LS2Z.js')),
-			__memo(() => import('./chunks/34-BPmyd4h6.js')),
-			__memo(() => import('./chunks/35-Bgck57DE.js')),
-			__memo(() => import('./chunks/36-1vynz2h9.js')),
-			__memo(() => import('./chunks/37-Cxd76vYz.js')),
-			__memo(() => import('./chunks/38-fB6sVWYa.js')),
-			__memo(() => import('./chunks/39-CcjBEEXT.js')),
-			__memo(() => import('./chunks/40-6yiPzjat.js')),
-			__memo(() => import('./chunks/41-_W3Lbfy2.js'))
+			__memo(() => import('./chunks/22-Bali5V0i.js')),
+			__memo(() => import('./chunks/23-CKCqGiwU.js')),
+			__memo(() => import('./chunks/24-BSV6YWxR.js')),
+			__memo(() => import('./chunks/25-FpTzevr2.js')),
+			__memo(() => import('./chunks/26-CRGky-wS.js')),
+			__memo(() => import('./chunks/27-DyOuT1tE.js')),
+			__memo(() => import('./chunks/28-0aAlAsdu.js')),
+			__memo(() => import('./chunks/29-D8nj2GAU.js')),
+			__memo(() => import('./chunks/30-D7IL0zOx.js')),
+			__memo(() => import('./chunks/31-BaIyWKAe.js')),
+			__memo(() => import('./chunks/32-CSLnzWjz.js')),
+			__memo(() => import('./chunks/33-BlTUnnR5.js')),
+			__memo(() => import('./chunks/34-RHKi9v8X.js')),
+			__memo(() => import('./chunks/35-BBTep5cK.js')),
+			__memo(() => import('./chunks/36-Bwxm1OSr.js')),
+			__memo(() => import('./chunks/37-CmLW-6SU.js')),
+			__memo(() => import('./chunks/38-DZnY3TsS.js')),
+			__memo(() => import('./chunks/39-sJMGD2rG.js')),
+			__memo(() => import('./chunks/40-YIbyapKO.js')),
+			__memo(() => import('./chunks/41-ErEJuTPL.js')),
+			__memo(() => import('./chunks/42-DqElP2Fm.js'))
 		],
 		remotes: {
 			
@@ -165,11 +166,32 @@ return {
 				endpoint: null
 			},
 			{
+				id: "/api/betslip/load",
+				pattern: /^\/api\/betslip\/load\/?$/,
+				params: [],
+				page: null,
+				endpoint: __memo(() => import('./chunks/_server.ts-BBd9s15m.js'))
+			},
+			{
+				id: "/api/betslip/share",
+				pattern: /^\/api\/betslip\/share\/?$/,
+				params: [],
+				page: null,
+				endpoint: __memo(() => import('./chunks/_server.ts-BapH5XLf.js'))
+			},
+			{
 				id: "/api/payhero/callback",
 				pattern: /^\/api\/payhero\/callback\/?$/,
 				params: [],
 				page: null,
 				endpoint: __memo(() => import('./chunks/_server.ts-B0QzArzp.js'))
+			},
+			{
+				id: "/api/place-bet",
+				pattern: /^\/api\/place-bet\/?$/,
+				params: [],
+				page: null,
+				endpoint: __memo(() => import('./chunks/_server.ts-CCkvz5lY.js'))
 			},
 			{
 				id: "/api/settle-bets",
@@ -249,115 +271,122 @@ return {
 				endpoint: null
 			},
 			{
+				id: "/profile/bets",
+				pattern: /^\/profile\/bets\/?$/,
+				params: [],
+				page: { layouts: [0,], errors: [1,], leaf: 26 },
+				endpoint: null
+			},
+			{
 				id: "/profile/preferences",
 				pattern: /^\/profile\/preferences\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 26 },
+				page: { layouts: [0,], errors: [1,], leaf: 27 },
 				endpoint: null
 			},
 			{
 				id: "/profile/security",
 				pattern: /^\/profile\/security\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 27 },
+				page: { layouts: [0,], errors: [1,], leaf: 28 },
 				endpoint: null
 			},
 			{
 				id: "/profile/verification",
 				pattern: /^\/profile\/verification\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 28 },
+				page: { layouts: [0,], errors: [1,], leaf: 29 },
 				endpoint: null
 			},
 			{
 				id: "/promotions",
 				pattern: /^\/promotions\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 29 },
+				page: { layouts: [0,], errors: [1,], leaf: 30 },
 				endpoint: null
 			},
 			{
 				id: "/referrals",
 				pattern: /^\/referrals\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 30 },
+				page: { layouts: [0,], errors: [1,], leaf: 31 },
 				endpoint: null
 			},
 			{
 				id: "/sportsbook",
 				pattern: /^\/sportsbook\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 31 },
+				page: { layouts: [0,], errors: [1,], leaf: 32 },
 				endpoint: null
 			},
 			{
 				id: "/sportsbook/match/[id]",
 				pattern: /^\/sportsbook\/match\/([^/]+?)\/?$/,
 				params: [{"name":"id","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,], errors: [1,], leaf: 32 },
+				page: { layouts: [0,], errors: [1,], leaf: 33 },
 				endpoint: null
 			},
 			{
 				id: "/sportsbook/[sport]",
 				pattern: /^\/sportsbook\/([^/]+?)\/?$/,
 				params: [{"name":"sport","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,], errors: [1,], leaf: 33 },
+				page: { layouts: [0,], errors: [1,], leaf: 34 },
 				endpoint: null
 			},
 			{
 				id: "/support",
 				pattern: /^\/support\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 34 },
+				page: { layouts: [0,], errors: [1,], leaf: 35 },
 				endpoint: null
 			},
 			{
 				id: "/support/new",
 				pattern: /^\/support\/new\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 35 },
+				page: { layouts: [0,], errors: [1,], leaf: 36 },
 				endpoint: null
 			},
 			{
 				id: "/support/[ticketId]",
 				pattern: /^\/support\/([^/]+?)\/?$/,
 				params: [{"name":"ticketId","optional":false,"rest":false,"chained":false}],
-				page: { layouts: [0,], errors: [1,], leaf: 36 },
+				page: { layouts: [0,], errors: [1,], leaf: 37 },
 				endpoint: null
 			},
 			{
 				id: "/vip",
 				pattern: /^\/vip\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 37 },
+				page: { layouts: [0,], errors: [1,], leaf: 38 },
 				endpoint: null
 			},
 			{
 				id: "/wallet",
 				pattern: /^\/wallet\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 38 },
+				page: { layouts: [0,], errors: [1,], leaf: 39 },
 				endpoint: null
 			},
 			{
 				id: "/wallet/deposit",
 				pattern: /^\/wallet\/deposit\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 39 },
+				page: { layouts: [0,], errors: [1,], leaf: 40 },
 				endpoint: null
 			},
 			{
 				id: "/wallet/history",
 				pattern: /^\/wallet\/history\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 40 },
+				page: { layouts: [0,], errors: [1,], leaf: 41 },
 				endpoint: null
 			},
 			{
 				id: "/wallet/withdraw",
 				pattern: /^\/wallet\/withdraw\/?$/,
 				params: [],
-				page: { layouts: [0,], errors: [1,], leaf: 41 },
+				page: { layouts: [0,], errors: [1,], leaf: 42 },
 				endpoint: null
 			}
 		],

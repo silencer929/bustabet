@@ -12,6 +12,7 @@
 
   const subNav = [
     { name: 'Security & Password', path: '/profile/security' },
+    {name: 'My bets', path: '/profile/bets'},
     { name: 'Identity Verification (KYC)', path: '/profile/verification' }
   ];
 </script>
