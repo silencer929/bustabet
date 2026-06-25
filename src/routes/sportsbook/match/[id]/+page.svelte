@@ -14,7 +14,9 @@
     'btts': false,
     'correct_score': false
   });
-
+  // Svelte 5 derived check: Evaluates if live or final scores should be rendered
+  const showScores = $derived(data.game.status === 'LIVE' || data.game.status === 'COMPLETED');
+  
   // Toggles the visibility state of a specific collapsible market accordion
   function toggleDrawer(marketKey: string) {
     openDrawers[marketKey] = !openDrawers[marketKey];
@@ -37,16 +39,42 @@
   </a>
 
   <!-- Scoreboard Details Display (Dynamic Light/Dark Mode) -->
+   <!-- Scoreboard Panel: Automatically adapts to active Dark/Light themes -->
   <div class="relative overflow-hidden rounded-2xl border border-border bg-card p-6 md:p-8 text-center space-y-6">
     <div class="text-[10px] font-black tracking-widest text-muted-foreground uppercase">{data.game.league}</div>
     
-    <div class="flex items-center justify-center gap-6 md:gap-12">
-      <div class="text-base md:text-xl font-black text-foreground">{data.game.homeTeam}</div>
-      <div class="text-xs font-black tracking-widest text-primary uppercase px-3 py-1 bg-background border border-border rounded-full">VS</div>
-      <div class="text-base md:text-xl font-black text-foreground">{data.game.awayTeam}</div>
+    <div class="flex items-center justify-center gap-4 sm:gap-8 max-w-xl mx-auto">
+      <!-- Home Team & Score (Right Aligned) -->
+      <div class="flex items-center gap-3 justify-end flex-1">
+        <span class="text-sm sm:text-lg font-black text-foreground text-right">{data.game.homeTeam}</span>
+        {#if showScores}
+          <!-- Displays running home score or final completed score -->
+          <span class="text-sm sm:text-base font-black text-primary px-2.5 py-1 bg-muted/60 border border-border rounded-lg shadow-sm">{data.game.homeScore ?? 0}</span>
+        {/if}
+      </div>
+
+      <!-- Center Status Divider Badge -->
+      <div class="text-[10px] font-black tracking-widest text-primary uppercase px-3.5 py-1 bg-background border border-border rounded-full shrink-0 shadow-sm">
+        {#if data.game.status === 'COMPLETED'}
+          FT
+        {:else if data.game.status === 'LIVE'}
+          LIVE
+        {:else}
+          VS
+        {/if}
+      </div>
+
+      <!-- Away Team & Score (Left Aligned) -->
+      <div class="flex items-center gap-3 justify-start flex-1">
+        {#if showScores}
+          <!-- Displays running away score or final completed score -->
+          <span class="text-sm sm:text-base font-black text-primary px-2.5 py-1 bg-muted/60 border border-border rounded-lg shadow-sm">{data.game.awayScore ?? 0}</span>
+        {/if}
+        <span class="text-sm sm:text-lg font-black text-foreground text-left">{data.game.awayTeam}</span>
+      </div>
     </div>
 
-    <!-- Match Result (H2H) -->
+    <!-- Match Result Primary Odds Panel -->
     {#if h2hMarkets.length > 0}
       <div class="max-w-md mx-auto space-y-2.5">
         <div class="text-[10px] font-black tracking-widest text-muted-foreground uppercase">Match Result</div>

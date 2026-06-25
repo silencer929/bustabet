@@ -3,6 +3,7 @@
   import { Button } from '$lib/components/ui/button';
   import { Badge } from '$lib/components/ui/badge';
   import { formatGameTime } from '$lib/utils/datetime';
+  import { Input } from '$lib/components/ui/input';
   import { ChevronLeft, ShieldAlert, CheckCircle2, Calendar, Trophy, Check } from 'lucide-svelte';
   import type { GameWithMarkets } from '$lib/types/game';
 
@@ -54,17 +55,81 @@
   </div>
 
   <!-- Scoreboard -->
-  <div class="rounded-2xl border border-neutral-800 bg-neutral-900/40 p-6 text-center space-y-4">
+  <div class="rounded-2xl  border border-border bg-card/40 p-6 text-center space-y-4">
     <span class="text-[10px] font-black tracking-widest text-neutral-500 uppercase">{data.game.league}</span>
     <div class="flex items-center justify-between max-w-xs mx-auto">
       <span class="text-sm font-black text-neutral-200">{data.game.homeTeam}</span>
-      <span class="text-xs font-black tracking-widest text-red-500 uppercase px-3 py-1 bg-neutral-950 border border-neutral-800 rounded-full">VS</span>
+      <span class="text-xs font-black tracking-widest text-red-500 uppercase px-3 py-1 bg-background border-border rounded-full">VS</span>
       <span class="text-sm font-black text-neutral-200">{data.game.awayTeam}</span>
     </div>
     <div class="text-[10px] font-bold text-neutral-500 flex items-center justify-center gap-1">
       <Calendar class="h-3.5 w-3.5" />
       <span>Kickoff {formatGameTime(data.game.startTime)}</span>
     </div>
+  </div>
+  <!-- Insert this card directly below your scoreboard panel inside +page.svelte -->
+  <div class="rounded-2xl border border-border bg-card/60 p-6 space-y-6">
+    <div class="space-y-1.5">
+      <h2 class="text-base font-black text-primary flex items-center gap-2">
+        <Trophy class="h-5 w-5 text-amber-500" />
+        Automated Score-Based Settlement
+      </h2>
+      <p class="text-xs text-muted-foreground font-semibold">Enter final scorelines. SvelteKit will mathematically evaluate and settle ALL markets (H2H, DNB, BTTS, Over/Under, Correct Score) simultaneously and process payouts instantly.</p>
+    </div>
+
+    <!-- SvelteKit Form submitting to the auto-calculator action -->
+    <form 
+      method="POST" 
+      action="?/settleWithScores"
+      use:enhance={() => {
+        isSubmitting = true;
+        return async ({ update }) => {
+          isSubmitting = false;
+          update();
+        };
+      }}
+      class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-neutral-800 pt-4"
+    >
+      <!-- Home Score -->
+      <div class="space-y-1.5">
+        <label for="homeScore" class="text-xs font-bold text-neutral-400">{data.game.homeTeam} Score</label>
+        <Input 
+          id="homeScore" 
+          name="homeScore" 
+          type="number" 
+          min="0" 
+          required 
+          disabled={isSubmitting}
+          placeholder="2" 
+          class="bg-background border-border focus:border-amber-500 text-xs h-10 font-bold text-neutral-200" 
+        />
+      </div>
+
+      <!-- Away Score -->
+      <div class="space-y-1.5">
+        <label for="awayScore" class="text-xs font-bold text-neutral-400">{data.game.awayTeam} Score</label>
+        <Input 
+          id="awayScore" 
+          name="awayScore" 
+          type="number" 
+          min="0" 
+          required 
+          disabled={isSubmitting}
+          placeholder="1" 
+          class="bg-background border-border focus:border-amber-500 text-xs h-10 font-bold text-foreground" 
+        />
+      </div>
+
+      <div class="sm:col-span-2 pt-2">
+        <Button 
+          type="submit" 
+          disabled={isSubmitting}
+          class="w-full h-11 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-black rounded-lg text-xs cursor-pointer"
+        >
+          {isSubmitting ? 'Evaluating & Paying Winners...' : 'Register Score & Settle All Markets'}
+        </Button>
+      </div>
+    </form>
   </div>
 
   <!-- Response Alerts -->
@@ -75,7 +140,7 @@
     </div>
   {/if}
   {#if form?.success}
-    <div class="flex items-start gap-2 rounded-lg bg-green-950/40 border border-green-800/80 px-4 py-3 text-xs text-green-400 font-bold leading-normal">
+    <div class="flex items-start gap-2 rounded-lg bg-background border border-border-800/80 px-4 py-3 text-xs text-green-400 font-bold leading-normal">
       <CheckCircle2 class="h-4 w-4 shrink-0 mt-0.5" />
       <span>{form.message}</span>
     </div>
