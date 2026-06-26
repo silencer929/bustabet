@@ -149,7 +149,7 @@
         const result = await response.json();
 
         if (!response.ok || !result.success) {
-          throw new Error(result.message || 'Wager processing failed');
+          throw new Error(result.message || 'Betslip processing failed');
         }
 
         wallet.deductStake(totalRequiredStake);
@@ -196,14 +196,14 @@
 
       <!-- Text Details -->
       <div class="space-y-1">
-        <h3 class="text-lg font-black text-foreground">Wager Placed!</h3>
-        <p class="text-xs text-muted-foreground font-semibold">Your bets have been successfully recorded in MySQL.</p>
+        <h3 class="text-lg font-black text-foreground">Bet Placed!</h3>
+        <p class="text-xs text-muted-foreground font-semibold">Your bets have been successfully placed.</p>
       </div>
 
       <!-- Quick Summary -->
       <div class="rounded-lg bg-background border border-border p-3.5 space-y-2 text-xs font-bold text-muted-foreground text-left">
         <div class="flex justify-between">
-          <span>Wager Type</span>
+          <span>Bet Type</span>
           <span class="text-foreground uppercase">{lastType}</span>
         </div>
         <div class="flex justify-between">
@@ -218,7 +218,7 @@
 
       <!-- Countdown helper -->
       <div class="text-[10px] text-muted-foreground font-bold animate-pulse">
-        Returning to Sportsbook dashboard in 3s...
+        Returning to Sportsbook dashboard in 10s...
       </div>
     </div>
   </div>

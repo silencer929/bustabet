@@ -9,6 +9,10 @@ const config = {
 	kit: {
 		// This will now correctly process the out folder locally!
 		adapter: adapter({ out: 'build' }),
+		// Disable strict origin checks entirely
+        csrf: {
+            checkOrigin: false
+		},
 		typescript: {
 			config: (config) => ({
 				...config,
