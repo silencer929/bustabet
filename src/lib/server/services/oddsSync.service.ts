@@ -1,9 +1,10 @@
 import { db } from '../db';
 import { OddsApiService } from './oddsApi.service';
-import { OddsEngineService } from './oddsEngine.service'; // Import the new engine
+import { OddsEngineService } from './oddsEngine.service';
 import type { RowDataPacket } from 'mysql2';
 
 export class OddsSyncService {
+  // Array of the absolute most popular, high-wagering leagues globally
     private static readonly FAMOUS_LEAGUES = [
     'soccer_english_premier_league',
     'basketball_nba',
@@ -29,19 +30,22 @@ export class OddsSyncService {
     'americanfootball_nfl',
     'americanfootball_nfl_preseason'
   ];
-
+  // In-memory cache registry to store timestamps of the last successful syncs
   private static cacheLock = new Map<string, number>();
 
+  // Checks if the cached data is still fresh based on a maximum age parameter (in milliseconds)
   private static isCacheFresh(key: string, maxAgeMs: number): boolean {
     const lastSync = this.cacheLock.get(key);
     if (!lastSync) return false;
     return (Date.now() - lastSync) < maxAgeMs;
   }
 
+  // Updates the cache lock registry with the current timestamp
   private static setCacheTimestamp(key: string) {
     this.cacheLock.set(key, Date.now());
   }
 
+  // Converts any incoming American or Decimal price to positive Decimal format
   private static parseOddsToDecimal(price: number): number {
     if (price === 0) return 1.01;
     if (price >= 100) {
@@ -52,12 +56,13 @@ export class OddsSyncService {
     return Number(price.toFixed(2));
   }
 
-  // Mode A: Standard baseline sync (Cost: 3 Credits). Syncs standard lines and triggers local synthesis
+  // Mode A: Standard baseline sync. Updates standard lines with a 1-hour cache lock.
   static async syncSportOddsStandard(sportKey: string): Promise<void> {
     const ONE_HOUR = 3600000;
 
+    // Guard: Intercept request and skip API call if standard odds were synced less than 1 hour ago
     if (this.isCacheFresh(sportKey, ONE_HOUR)) {
-      console.log(`[Cache Guard] Standard odds for ${sportKey} are fresh.`);
+      console.log(`[Cache Guard Active] Standard odds for ${sportKey} are fresh. Skipping API fetch.`);
       return;
     }
 
@@ -66,6 +71,9 @@ export class OddsSyncService {
 
     try {
       for (const match of rawOdds) {
+        // Guard: Ignore manually created game keys, isolating those matches entirely to local configurations
+        if (match.id.startsWith('MAN-')) continue;
+
         const commenceTime = new Date(match.commence_time);
         const isLive = new Date() >= commenceTime;
         const gameStatus = isLive ? 'LIVE' : 'UPCOMING';
@@ -97,20 +105,18 @@ export class OddsSyncService {
 
         const bookmaker = match.bookmakers.find(b => b.key === 'pinnacle') || match.bookmakers[0];
 
-        // Deactivate old active records
+        // Deactivate old active records for these specific standard markets only
         await conn.execute(
-          "UPDATE admin_game_markets SET active = 0 WHERE game_id = ?",
+          "UPDATE admin_game_markets SET active = 0 WHERE game_id = ? AND market_name IN ('h2h', 'spreads', 'totals')",
           [match.id]
         );
 
         let h2hHome = 2.0, h2hDraw = 3.4, h2hAway = 3.0, over25 = 1.9;
 
-        // Ingest raw API markets
         for (const market of bookmaker.markets) {
           for (const outcome of market.outcomes) {
             const normalizedOdds = this.parseOddsToDecimal(outcome.price);
 
-            // Record primary pricing inputs to feed to the synthesizer later
             if (market.key === 'h2h') {
               if (outcome.name === match.home_team) h2hHome = normalizedOdds;
               else if (outcome.name === 'Draw') h2hDraw = normalizedOdds;
@@ -139,25 +145,21 @@ export class OddsSyncService {
         }
 
         // --- DYNAMIC ODDS SYNTHESIZATION (0 EXTRA CREDITS USED) ---
-        // 1. Double Chance (Passed actual team names)
         const dc = OddsEngineService.synthesizeDoubleChance(h2hHome, h2hDraw, h2hAway, match.home_team, match.away_team);
         for (const item of dc) {
           await this.upsertSynthesizedLine(conn, match.id, 'double_chance', item.selection, item.odds);
         }
 
-        // 2. Draw No Bet (Passed actual team names)
         const dnb = OddsEngineService.synthesizeDrawNoBet(h2hHome, h2hDraw, h2hAway, match.home_team, match.away_team);
         for (const item of dnb) {
           await this.upsertSynthesizedLine(conn, match.id, 'draw_no_bet', item.selection, item.odds);
         }
 
-        // 3. Both Teams to Score (BTTS)
         const btts = OddsEngineService.synthesizeBothTeamsToScore(over25);
         for (const item of btts) {
-          await this.upsertSynthesizedLine(conn, match.id, 'over_under', item.selection, item.odds);
+          await this.upsertSynthesizedLine(conn, match.id, 'btts', item.selection, item.odds);
         }
 
-        // 4. Correct Scores (Generates 16 distinct scorelines)
         const scores = OddsEngineService.synthesizeCorrectScores(h2hHome, h2hDraw, h2hAway, over25);
         for (const item of scores) {
           await this.upsertSynthesizedLine(conn, match.id, 'correct_score', item.selection, item.odds);
@@ -167,6 +169,72 @@ export class OddsSyncService {
       }
 
       this.setCacheTimestamp(sportKey);
+    } catch (error) {
+      await conn.rollback();
+      throw error;
+    } finally {
+      conn.release();
+    }
+  }
+
+  // Mode B: Deep Event Harvest. Updates advanced prop lines with a 30-minute cache lock.
+  static async syncEventOddsDeep(sportKey: string, eventId: string): Promise<void> {
+    const THIRTY_MINUTES = 1800000;
+
+    // Guard: Ignore manually created game keys, isolating those matches entirely to local configurations
+    if (eventId.startsWith('MAN-')) return;
+
+    if (this.isCacheFresh(eventId, THIRTY_MINUTES)) {
+      console.log(`[Cache Guard Active] Advanced markets for match ${eventId} are fresh. Skipping API harvest.`);
+      return;
+    }
+
+    const harvestedData = await OddsApiService.harvestEvent(sportKey, eventId);
+    const conn = await db.getConnection();
+
+    try {
+      await conn.beginTransaction();
+
+      await conn.execute(
+        'UPDATE admin_game_markets SET active = 0 WHERE game_id = ?',
+        [eventId]
+      );
+
+      const processedSelections = new Set<string>();
+
+      for (const bookmaker of harvestedData.bookmakers) {
+        for (const market of bookmaker.markets) {
+          for (const outcome of market.outcomes) {
+            const selectionKey = `${market.key}-${outcome.name}`;
+            
+            if (processedSelections.has(selectionKey)) continue;
+
+            const normalizedOdds = this.parseOddsToDecimal(outcome.price);
+
+            const [existingMarkets] = await conn.execute<RowDataPacket[]>(
+              'SELECT id FROM admin_game_markets WHERE game_id = ? AND market_name = ? AND selection = ? LIMIT 1',
+              [eventId, market.key, outcome.name]
+            );
+
+            if (existingMarkets.length > 0) {
+              await conn.execute(
+                'UPDATE admin_game_markets SET odds = ?, active = 1 WHERE id = ?',
+                [normalizedOdds, existingMarkets[0].id]
+              );
+            } else {
+              await conn.execute(
+                'INSERT INTO admin_game_markets (id, game_id, market_name, selection, odds, active) VALUES (?, ?, ?, ?, ?, 1)',
+                [crypto.randomUUID(), eventId, market.key, outcome.name, normalizedOdds]
+              );
+            }
+
+            processedSelections.add(selectionKey);
+          }
+        }
+      }
+
+      await conn.commit();
+      this.setCacheTimestamp(eventId);
     } catch (error) {
       await conn.rollback();
       throw error;
