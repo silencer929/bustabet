@@ -58,10 +58,10 @@
   <div class="rounded-2xl border border-border bg-card p-6 text-center space-y-4">
     <span class="text-[10px] font-black tracking-widest text-muted-foreground uppercase">{data.game.league}</span>
     <div class="flex items-center justify-between max-w-xs mx-auto">
-      <span class="text-sm sm:text-base font-black text-foreground">{data.game.homeTeam}</span>
+      <span class="text-sm sm:text-base font-black text-foreground">{data.game.homeTeam}</span> 
       {#if data.game.homeScore !== null}
           <!-- Displays running home score or final completed score -->
-          <span class="text-sm sm:text-base font-black text-primary px-2.5 py-1 bg-muted/60 border border-border rounded-lg shadow-sm">{data.game.homeScore ?? 0}</span>
+         <span class="text-sm sm:text-base font-black text-primary px-2.5 py-1 bg-muted/60 border border-border rounded-lg shadow-sm">{data.game.homeScore ?? 0}</span>
         {/if}
       <span class="text-xs font-black tracking-widest text-primary uppercase px-3 py-1 bg-background border border-border rounded-full shrink-0 shadow-sm">VS</span>
       <span class="text-sm sm:text-base font-black text-foreground">{data.game.awayTeam}</span>

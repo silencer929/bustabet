@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   }
 
   const [games] = await db.execute<RowDataPacket[]>(
-    `SELECT id, sport, league, home_team as homeTeam, away_team as awayTeam, start_time as startTime, status 
+    `SELECT id, sport, league, home_team as homeTeam, away_team as awayTeam, home_score, away_score, start_time as startTime, status 
      FROM admin_games 
      WHERE id = ? LIMIT 1`,
     [params.id]
@@ -49,6 +49,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
       active: Boolean(m.active)
     }))
   };
+  console.log('[Admin Settle Page Load] Retrieved game with markets:', gameWithMarkets);
 
   return { game: gameWithMarkets };
 };

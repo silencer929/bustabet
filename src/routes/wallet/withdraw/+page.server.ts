@@ -31,13 +31,12 @@ export const actions: Actions = {
     if (!destination || destination.length < 4) {
       return fail(400, { error: 'Please specify a valid payment destination (e.g. Phone Number)' });
     }
-
     try {
       // Processes the request inside the WalletService checking local ledger balances
       await WalletService.initiateWithdrawal(
         locals.user.id,
         amount,
-        destination
+        destination // Pass the phone destination
       );
 
       return { 

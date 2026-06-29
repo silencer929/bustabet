@@ -182,7 +182,7 @@ export class WalletService {
   }
 
   // Initiates a withdrawal transaction after checking if the user has a sufficient balance
-  static async initiateWithdrawal(profileId: string, amount: number, reference: string): Promise<boolean> {
+  static async initiateWithdrawal(profileId: string, amount: number, destination: string): Promise<boolean> {
     const currentBalance = await this.getBalance(profileId);
     if (currentBalance < amount) throw new Error('Insufficient balance');
 
@@ -194,10 +194,15 @@ export class WalletService {
     const profile = profiles[0];
 
     const id = crypto.randomUUID();
+    
+    // Generate a completely unique, randomized withdrawal reference code to prevent double-entry rejections
+    const reference = 'WD-' + Math.random().toString(36).substring(2, 12).toUpperCase();
+
+    // Write the random reference code and the non-unique phone number to the database
     await db.execute(
-      `INSERT INTO transactions (id, profile_id, type, amount, currency, status, reference) 
-       VALUES (?, ?, 'WITHDRAWAL', ?, ?, 'PENDING', ?)`,
-      [id, profileId, amount, profile.currency || 'USD', reference]
+      `INSERT INTO transactions (id, profile_id, type, amount, currency, status, reference, destination) 
+       VALUES (?, ?, 'WITHDRAWAL', ?, ?, 'PENDING', ?, ?)`,
+      [id, profileId, amount, profile.currency || 'USD', reference, destination]
     );
 
     return true;
